@@ -4,3 +4,10 @@ This project aims to build a companion app to the popular board game "Monopoly".
 
 ## Purpose 
 
+## Features
+
+## Structure
+
+## Requirements
+
+## Parking Lot
