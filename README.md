@@ -1,13 +1,34 @@
 # Monopoly Companion App
-
-This project aims to build a companion app to the popular board game "Monopoly". The app's aim is to help players track, visualize, and analyze real games played. 
+This project aims to build a companion app to the popular board game "Monopoly". 
 
 ## Purpose 
+The app's aim is to help players track, visualize, and analyze real games played. The app is intended to be used alongside the board game, capturing all moves made and their outcomes. 
+
+The purpose is to enrich Monopoly players' understanding of the game. The app tracks and shows statistics and trends on player wealth in real time, as well as information on the value of properties. It effectively provides a real-time scoreboard and can help players factually reflect on strategic choices, as well as the role of luck in determining the outcome of the game. 
 
 ## Features
+Features include:
+- Selection of popular versions of Monopoly to determine property names and values
+- Ability to add custom versions of Monopoly, including property names and values
+- Selection of number of players and their respective game pieces
+- Turn count display
+- Current player display
+- Selection of roll outcome (e.g., landing on chance/community chest, a property, or being sent to jail) and implications (e.g., money paid and received, property ownership changes, or going to jail)
+- Real-time tracking of all players' cash balances and property ownership 
+- Storage of turn-by-turn events and player wealth
+- Visual display of key player statistics over time (e.g., player cash wealth, player property wealth, times sent to jail, net income from chance/community chest, income generated from properties, etc.)
+- Visual display of key property statistics over time (e.g., income generated from property, times landed on property, etc.)
+- Ability to save and export game statistics
 
-## Structure
-
-## Requirements
+## Structure and Technical Info
+The Monopoly Companion App is a web application built on the Django or Flask framework (TBD). 
+Thoughts:
+- SQL database? 
+- Django more structured
+- Flask more flexible
+- How does app structure differ from web interface? 
+- Other options for frameworks? Consider whether Dash could accomplish the result. Think about what the GUI library was that enabled original prototype.
+- Integrate Dash for graph representations?  
+- 
 
 ## Parking Lot
