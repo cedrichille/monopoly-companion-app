@@ -21,14 +21,27 @@ Features include:
 - Ability to save and export game statistics
 
 ## Structure and Technical Info
-The Monopoly Companion App is a web application built on the Django or Flask framework (TBD). 
+The Monopoly Companion App is a web application built on the Flask framework. 
 Thoughts:
-- SQL database? 
-- Django more structured
-- Flask more flexible
+- SQL database or pandas? SQLAlchemy, PostgreSQL, SQLite, MySQL...?
+    - Dev in SQLite and then transition to Postgres for deploy (if we get that far). Good to get experience with setting up the database and CRUD operations.
+    - But won't be using SQL syntax, SQLAlchemy will be needed in any case. Good to have this additional skill, but maybe in parallel practice SQL itself?
 - How does app structure differ from web interface? 
-- Other options for frameworks? Consider whether Dash could accomplish the result. Think about what the GUI library was that enabled original prototype.
-- Integrate Dash for graph representations?  
-- 
+    - Need to map out:
+        - Database schema 
+        - Possible operations on database for game moves (CRUD + export)
+        - html templates
+        - Forms in html or WTForms
+        - Flask routes 
+        - Flask requests
+        
+- Integrate Dash for graph representations? 
+
+Dependencies:
+- Flask
+- Flask-SQLAlchemy
+- sqlite3 (included in python)
+- WTForms
+- Bootstrap-Flask
 
 ## Parking Lot
