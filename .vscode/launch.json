@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "flask_tutorial_app.webapp",
+                "FLASK_APP": "monopoly_companion.webapp",
                 "FLASK_DEBUG": "1"
             },
             "args": [
