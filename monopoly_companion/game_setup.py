@@ -3,11 +3,11 @@ from flask import (Blueprint, flash, g, redirect, render_template, request, sess
 from datetime import datetime
 from monopoly_companion.db import get_db
 
-bp = Blueprint('game_setup', __name__, url_prefix='/game-setup')
+bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
-@bp.route("/")
-def home():
-    return render_template("home.html")
+@bp.route("/", methods=("GET","POST"))
+def index():
+        return render_template("game_setup/index.html")
 
 @bp.route("/hello/")
 @bp.route("/hello/<name>")
