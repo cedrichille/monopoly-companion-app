@@ -1,7 +1,7 @@
 import functools
 from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
 from datetime import datetime
-from monopoly_companion.db import get_db
+from monopoly_companion.db import get_db, init_property_ownership
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
@@ -33,6 +33,8 @@ def index():
             session['game_version_id'] = game_version['game_version_id']
             session['no_of_players'] = no_of_players
             
+            init_property_ownership(game_version['game_version_id'])
+
             return redirect(url_for('game_setup.player_registration'))
 
         flash(error)

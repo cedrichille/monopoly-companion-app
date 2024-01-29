@@ -1,0 +1,12 @@
+[
+    {
+        "game_version_id": "1",
+        "game_version_name": "Monopoly NL",
+        "game_version_language": "Nederlands"
+    },
+    {
+        "game_version_id": "2",
+        "game_version_name": "Costco Monopoly",
+        "game_version_language": "English"
+    }
+]
