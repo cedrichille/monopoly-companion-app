@@ -9,7 +9,7 @@ def get_db():
             detect_types=sqlite3.PARSE_DECLTYPES
         )
         g.db.row_factory = sqlite3.Row
-    
+
     return g.db
 
 def close_db(e=None):
@@ -23,6 +23,9 @@ def init_db():
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
+    
+    # use pandas to insert the static data for game version, properties, etc. from json
+    # and add bank and free parking player info, as well as initial property ownership. 
 
 @click.command('init-db')
 def init_db_command():

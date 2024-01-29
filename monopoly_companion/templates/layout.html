@@ -16,6 +16,9 @@
     <div class="body-content">
         {% block content %}
         {% endblock %}
+        {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
         <hr/>
         <footer>
             <p>&copy; 2024</p>

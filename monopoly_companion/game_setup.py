@@ -5,17 +5,44 @@ from monopoly_companion.db import get_db
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
+# this blueprint contains the code for game version selection and player registration.
+
 @bp.route("/", methods=("GET","POST"))
 def index():
-        return render_template("game_setup/index.html")
+    if request.method == "POST":
+        game_version_name = request.form['game_version']
+        no_of_players = request.form['no_of_players']
+        db = get_db()
+        error = None
+        
+        if not game_version_name:
+            error = 'Game version is required.'
+        elif not no_of_players:
+            error = 'Number of players is required.'
 
-@bp.route("/hello/")
-@bp.route("/hello/<name>")
-def hello_there(name = None):
+        if error is None:
+            game_version = db.execute(
+                "SELECT * FROM game_version WHERE game_version_name = ?",
+                (game_version_name,)
+            ).fetchone()
+
+        if game_version is None:
+            error = 'Game version not found'
+        else:
+            session.clear()
+            session['game_version_id'] = game_version['game_version_id']
+            session['no_of_players'] = no_of_players
+            
+            return redirect(url_for('game_setup.player_registration'))
+
+        flash(error)
+
+    return render_template("game_setup/index.html")
+
+@bp.route("/player_registration/", methods=("GET","POST"))
+def player_registration(name = None):
     return render_template(
-        "hello_there.html",
-        name=name,
-        date=datetime.now()
+        "game_setup/player_registration.html"
     )
 
 @bp.route("/api/data")

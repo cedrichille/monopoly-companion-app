@@ -1,8 +1,14 @@
 {% extends "layout.html" %}
 {% block title %}
-Home
+Game Setup
 {% endblock %}
 {% block content %}
-<p>Home page for the Flask tutorial.</p>
-<a href="{{ url_for('game_setup.get_data') }}">Get data</a>
+<p>Select your game version and number of players below.</p>
+<form method="post">
+    <label for="game_version">Game Version</label>
+    <input name="game_version" id="game_version">
+    <label for="no_of_players">Number of Players</label>
+    <input name="no_of_players" id="no_of_players">
+    <input type="submit" value="Submit">
+</form>
 {% endblock %}
