@@ -57,12 +57,66 @@ def init_property_ownership(game_version_id):
             (prop['property_id'],)
         )
     db.commit()
+
+    update_number_owned()
+
     return 
 
 def update_number_owned():
     # join property and property_ownership tables on property_id
     # count how many properties owned within city by owner
     # insert the count into property_ownership.number_owned
+    db = get_db()
+
+    # get a joined table containing owner id-city combos with counts
+    city_ownership = db.execute(
+        """
+        SELECT 
+        property_ownership.owner_player_id,
+        property.city,
+        COUNT(property.property_id) AS number_owned_in_city
+        from 
+        property_ownership 
+        LEFT JOIN 
+        property
+        ON
+        property_ownership.property_id = property.property_id
+        GROUP BY
+        property.city,
+        property_ownership.owner_player_id;
+        """
+    )
+
+    # for each row in the owner-city combo table, 
+    # collect the variables we need for update and update the ownership table. 
+    # This requires us to check which properties are in the cities, since ownership table doesn't have a city field. 
+    for city_owner_combo in city_ownership:
+        number_owned = city_owner_combo['number_owned_in_city']
+        owner_id = city_owner_combo['owner_player_id']
+        city = city_owner_combo['city']
+        
+        db.execute(
+            """
+            UPDATE 
+            property_ownership
+            SET 
+            number_owned = ?
+            WHERE
+            owner_player_id = ? 
+            AND 
+            property_id IN 
+                (SELECT
+                property_id
+                FROM
+                property
+                WHERE
+                property.city = ?)
+            """,
+            (number_owned, owner_id, city,)
+        )
+        
+    db.commit()
+
     return 
 
 @click.command('init-db')

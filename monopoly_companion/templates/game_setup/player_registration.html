@@ -3,6 +3,17 @@
 Player Registration
 {% endblock %}
 {% block content %}
-<p>Enter your player information below.</p>
-
+<p>Enter your player information below. The order entered determines your playing order.</p>
+<hr/>
+<form method="post">
+    {% for player in range(1, no_of_players+1) %}
+        <p class="player_label">Player {{player}}</p>
+        <label for="player_name">Name</label>
+        <input name="player_name" id="player_name">
+        <label for="game_piece">Game Piece</label>
+        <input name="game_piece" id="game_piece">
+        <br><br>
+    {% endfor %}   
+    <input type="submit" value="Submit">
+</form>
 {% endblock %}

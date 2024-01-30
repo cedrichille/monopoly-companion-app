@@ -158,3 +158,10 @@ input[type=submit]:hover {
 .flash {
   color: red
 }
+
+.player_label {
+  font-family: "Oswald", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: red;
+  text-align: left;
+}

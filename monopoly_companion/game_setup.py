@@ -11,7 +11,7 @@ bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='
 def index():
     if request.method == "POST":
         game_version_name = request.form['game_version']
-        no_of_players = request.form['no_of_players']
+        no_of_players = int(request.form['no_of_players'])
         db = get_db()
         error = None
         
@@ -43,8 +43,12 @@ def index():
 
 @bp.route("/player_registration/", methods=("GET","POST"))
 def player_registration(name = None):
+    no_of_players = session['no_of_players']
+    
+
+
     return render_template(
-        "game_setup/player_registration.html"
+        "game_setup/player_registration.html",no_of_players=no_of_players
     )
 
 @bp.route("/api/data")
