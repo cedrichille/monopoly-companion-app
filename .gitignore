@@ -1,1 +1,4 @@
-.vscode/settings.json
+.vscode/
+__pycache__/
+.venv/
+monopoly_companion.__pycache__/
