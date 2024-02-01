@@ -8,13 +8,13 @@ DROP TABLE IF EXISTS net_worth;
 DROP TABLE IF EXISTS transactions;
 
 CREATE TABLE "game_version" (
-  "game_version_id" INTEGER NOT NULL PRIMARY KEY,
+  "game_version_id" INTEGER PRIMARY KEY,
   "game_version_name" VARCHAR NOT NULL,
   "game_version_language" VARCHAR NOT NULL
 );  
 
 CREATE TABLE "property" (
-  "property_id" INTEGER NOT NULL PRIMARY KEY,
+  "property_id" INTEGER PRIMARY KEY,
   "game_version_id" INTEGER NOT NULL,
   "property_name" VARCHAR NOT NULL,
   "property_type" VARCHAR NOT NULL,
@@ -40,20 +40,20 @@ CREATE TABLE "property" (
 );
 
 CREATE TABLE "action_type" (
-  "action_type_id" INTEGER NOT NULL PRIMARY KEY,
+  "action_type_id" INTEGER PRIMARY KEY,
   "action_type_name" VARCHAR NOT NULL,
   "exchange_type" VARCHAR NOT NULL
 );
 
 CREATE TABLE "players" (
-  "player_id" INTEGER NOT NULL PRIMARY KEY,
+  "player_id" INTEGER PRIMARY KEY,
   "player_name" VARCHAR NOT NULL,
   "player_piece" VARCHAR NOT NULL,
   "player_order" INTEGER NOT NULL
 );
 
 CREATE TABLE "special_counter" (
-  "special_counter_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "special_counter_id" INTEGER PRIMARY KEY,
   "counter_time" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "turn" INTEGER NOT NULL,
   "player_id" INTEGER NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE "special_counter" (
 );
 
 CREATE TABLE "property_ownership" (
-  "property_id" INTEGER NOT NULL PRIMARY KEY,
+  "property_id" INTEGER PRIMARY KEY,
   "owner_player_id" INTEGER NOT NULL,
   "mortgaged" boolean,
   "houses" INTEGER NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE "property_ownership" (
 );
 
 CREATE TABLE "net_worth" (
-  "net_worth_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "net_worth_id" INTEGER PRIMARY KEY,
   "net_worth_time" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "turn" INTEGER NOT NULL,
   "player_id" INTEGER NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE "net_worth" (
 );
 
 CREATE TABLE "transactions" (
-  "transaction_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "transaction_id" INTEGER PRIMARY KEY,
   "transaction_time" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "turn" INTEGER NOT NULL,
   "party_player_id" INTEGER NOT NULL,

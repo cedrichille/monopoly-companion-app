@@ -22,7 +22,7 @@ def index():
 
         if error is None:
             game_version = db.execute(
-                "SELECT * FROM game_version WHERE game_version_name = ?",
+                "SELECT rowid,* FROM game_version WHERE game_version_name = ?",
                 (game_version_name,)
             ).fetchone()
 
@@ -30,10 +30,10 @@ def index():
             error = 'Game version not found'
         else:
             session.clear()
-            session['game_version_id'] = game_version['game_version_id']
+            session['game_version_id'] = game_version['rowid']
             session['no_of_players'] = no_of_players
             
-            init_property_ownership(game_version['game_version_id'])
+            init_property_ownership(game_version['rowid'])
 
             return redirect(url_for('game_setup.player_registration'))
 
@@ -44,9 +44,30 @@ def index():
 @bp.route("/player_registration/", methods=("GET","POST"))
 def player_registration(name = None):
     no_of_players = session['no_of_players']
-    
+    player_names = []
 
+    if request.method == "POST":
+        db = get_db()
+        error = None
 
+        for player in range(1, no_of_players+1):
+            player_name = request.form['player_' + str(player) + '_name'] 
+
+            if not player_name:
+                error = "Player " + str(player) + " name required"
+                flash(error)
+            else:
+                player_names.append(player_name)
+        
+        if error is None:
+            for player in player_names:
+                db.execute(
+                    "INSERT INTO players(player_name, player_order) VALUES (?, ?)",
+                    (player, player_names.index(player)+1)
+                )
+            db.commit()
+            return redirect(url_for('get_data'))
+        
     return render_template(
         "game_setup/player_registration.html",no_of_players=no_of_players
     )

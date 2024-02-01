@@ -7,11 +7,8 @@ Player Registration
 <hr/>
 <form method="post">
     {% for player in range(1, no_of_players+1) %}
-        <p class="player_label">Player {{player}}</p>
-        <label for="player_name">Name</label>
-        <input name="player_name" id="player_name">
-        <label for="game_piece">Game Piece</label>
-        <input name="game_piece" id="game_piece">
+        <!--  <label for="player_name">Player {{player}} Name</label> -->
+        <input name="player_{{player|string()}}_name" id="player_name", placeholder="Player {{player}} Name">
         <br><br>
     {% endfor %}   
     <input type="submit" value="Submit">

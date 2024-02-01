@@ -1,81 +1,65 @@
 [
     {
-        "action_type_id": "1",
         "action_type_name": "purchase property",
         "exchange_type": "cash and property"
     },
     {
-        "action_type_id": "2",
         "action_type_name": "rent",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "3",
         "action_type_name": "pass go",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "4",
         "action_type_name": "land on go",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "5",
         "action_type_name": "build house",
         "exchange_type": "cash and improvement"
     },
     {
-        "action_type_id": "6",
         "action_type_name": "build hotel",
         "exchange_type": "cash and improvement"
     },
     {
-        "action_type_id": "7",
         "action_type_name": "mortgage property",
         "exchange_type": "cash and property"
     },
     {
-        "action_type_id": "8",
         "action_type_name": "unmortgage property",
         "exchange_type": "cash and property"
     },
     {
-        "action_type_id": "9",
         "action_type_name": "trade property ",
         "exchange_type": "cash and property"
     },
     {
-        "action_type_id": "10",
         "action_type_name": "chance",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "11",
         "action_type_name": "community chest",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "12",
         "action_type_name": "free parking",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "13",
         "action_type_name": "jail",
         "exchange_type": "none"
     },
     {
-        "action_type_id": "14",
         "action_type_name": "leave jail",
         "exchange_type": "cash or card"
     },
     {
-        "action_type_id": "15",
         "action_type_name": "income tax",
         "exchange_type": "cash"
     },
     {
-        "action_type_id": "16",
         "action_type_name": "luxury tax",
         "exchange_type": "cash"
     }

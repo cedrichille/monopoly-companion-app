@@ -33,11 +33,13 @@ def init_data():
         data = pd.read_json(current_app.open_resource('static/' + df + '.json'))
         data.to_sql(df, con=db, if_exists="replace", index=False)
 
+    return
+
 def init_property_ownership(game_version_id):
     db = get_db()
 
     properties = db.execute(
-        "SELECT * FROM property WHERE game_version_id = ?",
+        "SELECT rowid, * FROM property WHERE game_version_id = ?",
         (game_version_id,)
         ).fetchall()
     
@@ -54,7 +56,7 @@ def init_property_ownership(game_version_id):
     for prop in properties:
         db.execute(
             "INSERT INTO property_ownership VALUES (?, 1, FALSE, 0, 0, 0)",
-            (prop['property_id'],)
+            (prop['rowid'],)
         )
     db.commit()
 
@@ -63,9 +65,6 @@ def init_property_ownership(game_version_id):
     return 
 
 def update_number_owned():
-    # join property and property_ownership tables on property_id
-    # count how many properties owned within city by owner
-    # insert the count into property_ownership.number_owned
     db = get_db()
 
     # get a joined table containing owner id-city combos with counts
@@ -74,13 +73,13 @@ def update_number_owned():
         SELECT 
         property_ownership.owner_player_id,
         property.city,
-        COUNT(property.property_id) AS number_owned_in_city
+        COUNT(property.rowid) AS number_owned_in_city
         from 
         property_ownership 
         LEFT JOIN 
         property
         ON
-        property_ownership.property_id = property.property_id
+        property_ownership.property_id = property.rowid
         GROUP BY
         property.city,
         property_ownership.owner_player_id;
@@ -104,9 +103,9 @@ def update_number_owned():
             WHERE
             owner_player_id = ? 
             AND 
-            property_id IN 
+            rowid IN 
                 (SELECT
-                property_id
+                rowid
                 FROM
                 property
                 WHERE

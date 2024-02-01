@@ -1,6 +1,5 @@
 [
     {
-        "property_id": "1",
         "game_version_id": "1",
         "property_name": "Dorpsstraat",
         "property_type": "Street",
@@ -24,7 +23,6 @@
         "rent_four_owned": "4"
     },
     {
-        "property_id": "2",
         "game_version_id": "1",
         "property_name": "Brink",
         "property_type": "Street",
@@ -48,7 +46,6 @@
         "rent_four_owned": "8"
     },
     {
-        "property_id": "3",
         "game_version_id": "1",
         "property_name": "Steenstraat",
         "property_type": "Street",
@@ -72,7 +69,6 @@
         "rent_four_owned": "12"
     },
     {
-        "property_id": "4",
         "game_version_id": "1",
         "property_name": "Ketelstraat",
         "property_type": "Street",
@@ -96,7 +92,6 @@
         "rent_four_owned": "12"
     },
     {
-        "property_id": "5",
         "game_version_id": "1",
         "property_name": "Velperplein",
         "property_type": "Street",
@@ -120,7 +115,6 @@
         "rent_four_owned": "16"
     },
     {
-        "property_id": "6",
         "game_version_id": "1",
         "property_name": "Barteljorisstraat",
         "property_type": "Street",
@@ -144,7 +138,6 @@
         "rent_four_owned": "20"
     },
     {
-        "property_id": "7",
         "game_version_id": "1",
         "property_name": "Zijlweg",
         "property_type": "Street",
@@ -168,7 +161,6 @@
         "rent_four_owned": "20"
     },
     {
-        "property_id": "8",
         "game_version_id": "1",
         "property_name": "Houtstraat",
         "property_type": "Street",
@@ -192,7 +184,6 @@
         "rent_four_owned": "24"
     },
     {
-        "property_id": "9",
         "game_version_id": "1",
         "property_name": "Neude",
         "property_type": "Street",
@@ -216,7 +207,6 @@
         "rent_four_owned": "28"
     },
     {
-        "property_id": "10",
         "game_version_id": "1",
         "property_name": "Biltstraat",
         "property_type": "Street",
@@ -240,7 +230,6 @@
         "rent_four_owned": "28"
     },
     {
-        "property_id": "11",
         "game_version_id": "1",
         "property_name": "Vreeburg",
         "property_type": "Street",
@@ -264,7 +253,6 @@
         "rent_four_owned": "32"
     },
     {
-        "property_id": "12",
         "game_version_id": "1",
         "property_name": "A-Kerkhof",
         "property_type": "Street",
@@ -288,7 +276,6 @@
         "rent_four_owned": "36"
     },
     {
-        "property_id": "13",
         "game_version_id": "1",
         "property_name": "Grote Markt",
         "property_type": "Street",
@@ -312,7 +299,6 @@
         "rent_four_owned": "36"
     },
     {
-        "property_id": "14",
         "game_version_id": "1",
         "property_name": "Herestraat",
         "property_type": "Street",
@@ -336,7 +322,6 @@
         "rent_four_owned": "40"
     },
     {
-        "property_id": "15",
         "game_version_id": "1",
         "property_name": "Spui",
         "property_type": "Street",
@@ -360,7 +345,6 @@
         "rent_four_owned": "44"
     },
     {
-        "property_id": "16",
         "game_version_id": "1",
         "property_name": "Plein",
         "property_type": "Street",
@@ -384,7 +368,6 @@
         "rent_four_owned": "44"
     },
     {
-        "property_id": "17",
         "game_version_id": "1",
         "property_name": "Lange Poten",
         "property_type": "Street",
@@ -408,7 +391,6 @@
         "rent_four_owned": "48"
     },
     {
-        "property_id": "18",
         "game_version_id": "1",
         "property_name": "Hofplein",
         "property_type": "Street",
@@ -432,7 +414,6 @@
         "rent_four_owned": "52"
     },
     {
-        "property_id": "19",
         "game_version_id": "1",
         "property_name": "Blaak",
         "property_type": "Street",
@@ -456,7 +437,6 @@
         "rent_four_owned": "52"
     },
     {
-        "property_id": "20",
         "game_version_id": "1",
         "property_name": "Coolsingel",
         "property_type": "Street",
@@ -480,7 +460,6 @@
         "rent_four_owned": "56"
     },
     {
-        "property_id": "21",
         "game_version_id": "1",
         "property_name": "Leidsestraat",
         "property_type": "Street",
@@ -504,7 +483,6 @@
         "rent_four_owned": "70"
     },
     {
-        "property_id": "22",
         "game_version_id": "1",
         "property_name": "Kalverstraat",
         "property_type": "Street",
@@ -528,7 +506,6 @@
         "rent_four_owned": "100"
     },
     {
-        "property_id": "23",
         "game_version_id": "1",
         "property_name": "Zuid",
         "property_type": "Station",
@@ -552,7 +529,6 @@
         "rent_four_owned": "200"
     },
     {
-        "property_id": "24",
         "game_version_id": "1",
         "property_name": "West",
         "property_type": "Station",
@@ -576,7 +552,6 @@
         "rent_four_owned": "200"
     },
     {
-        "property_id": "25",
         "game_version_id": "1",
         "property_name": "Noord",
         "property_type": "Station",
@@ -600,7 +575,6 @@
         "rent_four_owned": "200"
     },
     {
-        "property_id": "26",
         "game_version_id": "1",
         "property_name": "Oost",
         "property_type": "Station",
@@ -624,7 +598,6 @@
         "rent_four_owned": "200"
     },
     {
-        "property_id": "27",
         "game_version_id": "1",
         "property_name": "Elektriciteitsbedrijf",
         "property_type": "Utility",
@@ -648,7 +621,6 @@
         "rent_four_owned": ""
     },
     {
-        "property_id": "28",
         "game_version_id": "1",
         "property_name": "Waterleidingbedrijf",
         "property_type": "Utility",
