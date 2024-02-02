@@ -78,7 +78,6 @@ def player_registration():
                     error = "net_worth table didn't find player"
                 else:
                     player_net_worths[player] = net_worth
-            
             session['player_names'] = player_names
             session['game_started'] = 1
             session['net_worths'] = player_net_worths        
