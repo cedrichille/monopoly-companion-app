@@ -8,9 +8,13 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('game_setup.index') }}" class="navbar-brand">Home</a>
-        <a href="{{ url_for('game_setup.about') }}" class="navbar-item">About</a>
-        <a href="{{ url_for('game_setup.contact') }}" class="navbar-item">Contact</a>
+        <a href="{{ url_for('welcome.index') }}" class="navbar-brand">Home</a>
+    </div>
+
+    <div class="sidebar">
+        <a class="active" href="{{ url_for('welcome.index') }}">Home</a>
+        <a href="{{ url_for('game_setup.index') }}">Game Setup</a>
+        <a href="{{ url_for('game_setup.player_registration') }}">Player Registration</a>
     </div>
 
     <div class="body-content">

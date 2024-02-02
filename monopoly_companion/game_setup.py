@@ -1,6 +1,4 @@
-import functools
 from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
-from datetime import datetime
 from monopoly_companion.db import get_db, init_property_ownership
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
@@ -42,7 +40,7 @@ def index():
     return render_template("game_setup/index.html")
 
 @bp.route("/player_registration/", methods=("GET","POST"))
-def player_registration(name = None):
+def player_registration():
     no_of_players = session['no_of_players']
     player_names = []
 
@@ -66,20 +64,27 @@ def player_registration(name = None):
                     (player, player_names.index(player)+1)
                 )
             db.commit()
-            return redirect(url_for('get_data'))
+
+            # Need to do net worth dictionary calc and sql insert here and make it available to gameplay.py and gameplay.index.html
+            player_net_worths = {}
+
+            for player in player_names:
+                # get net worth figure. 
+                net_worth = db.execute(
+                    "SELECT net_worth FROM net_worth WHERE player_id = ?",
+                    (player_names.index(player),)
+                )
+                if not net_worth:
+                    error = "net_worth table didn't find player"
+                else:
+                    player_net_worths[player] = net_worth
+            
+            session['player_names'] = player_names
+            session['game_started'] = 1
+            session['net_worths'] = player_net_worths        
+
+            return redirect(url_for("gameplay.index"),player_names=player_names, player_net_worths=player_net_worths)
         
     return render_template(
         "game_setup/player_registration.html",no_of_players=no_of_players
     )
-
-@bp.route("/api/data")
-def get_data():
-    return bp.send_static_file("data.json")
-
-@bp.route("/about/")
-def about():
-    return render_template("about.html")
-
-@bp.route("/contact/")
-def contact():
-    return render_template("contact.html")

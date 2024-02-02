@@ -25,11 +25,14 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
+    from . import welcome
+    app.register_blueprint(welcome.bp)
+
     from . import game_setup
     app.register_blueprint(game_setup.bp)
 
-    from . import welcome
-    app.register_blueprint(welcome.bp)
+    from . import gameplay
+    app.register_blueprint(gameplay.bp)
 
     return app
 

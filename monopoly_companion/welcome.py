@@ -1,7 +1,5 @@
-import functools
 from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
-from datetime import datetime
-from monopoly_companion.db import get_db, init_data
+from monopoly_companion.db import init_data
 
 bp = Blueprint('welcome',__name__,url_prefix='/welcome')
 
