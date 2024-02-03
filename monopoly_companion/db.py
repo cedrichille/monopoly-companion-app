@@ -331,11 +331,25 @@ def get_net_worth(db):
 def update_net_worth(db):
     return
 
-def next_turn():
-    return
+def next_player(current_player_order, no_of_players, turn):
+    # increment the current_player_order up to the no_of_players, at which point it restarts at order 1 and increments turn
 
-def previous_turn():
-    return
+    if current_player_order == no_of_players:
+        current_player_order = 1 
+        turn += 1
+    else:
+        current_player_order += 1
+    return current_player_order, turn
+
+def previous_player(current_player_order, no_of_players, turn):
+    # decrement the current_player_order down to 1, at which point it restarts at no_of_players and decrements turn
+
+    if current_player_order == 1:
+        current_player_order = no_of_players
+        turn -= 1
+    else:
+        current_player_order -= 1
+    return current_player_order, turn
 
 def undo_action():
     return

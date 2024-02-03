@@ -10,13 +10,14 @@ Gameplay
   {% endfor %}
 </div>
 
-<p>Current player: {{ current_player[0] }} &emsp; Turn: {{ current_turn }}</p>
+<p>Current player: {{ players[current_player_id|string][0] }} &emsp; Turn: {{ current_turn }}</p>
+<form method="post">
+  <input type="submit" value="Next player">
+</form>
 
 <nav>
     <ul>
-      {% for player in players.items() %}
-        <li><span>Name: {{ player[1][0] }}. Order: {{ player[1][1] }}. Cash Balance: ${{ net_worths[player[0]][0] }}. Net Worth: ${{ net_worths[player[0]][4] }}</span>
-      {% endfor %}
+
     </ul>
 </nav>
 

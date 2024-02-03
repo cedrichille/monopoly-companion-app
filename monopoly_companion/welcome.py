@@ -9,6 +9,8 @@ def index():
         db = get_db()
         init_data(db)
         
+        session['game_started'] = 0
+
         return redirect(url_for("game_setup.index"))
     else:
         return render_template("welcome/index.html")

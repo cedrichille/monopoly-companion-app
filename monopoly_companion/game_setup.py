@@ -64,8 +64,7 @@ def player_registration():
                     "INSERT INTO players(player_name, player_order) VALUES (?, ?)",
                     (player, player_names.index(player)+1)
                 )
-
-                player_dict[player_names.index(player)+3] = [player, player_names.index(player)+1]
+                player_dict[int(player_names.index(player)+3)] = [player, player_names.index(player)+1]
 
             # Need to do net worth dictionary calc and sql insert here and make it available to gameplay.py and gameplay.index.html
             total_cash, starting_cash_per_player = db.execute(
@@ -99,7 +98,7 @@ def player_registration():
             current_net_worth_table, current_net_worths = get_net_worth(db)
 
             session['player_dict'] = player_dict
-            session['current_player'] = player_dict[3]
+            session['current_player_id'] = 3
             session['game_started'] = 1
             session['current_turn'] = 1
             session['net_worths'] = current_net_worths
