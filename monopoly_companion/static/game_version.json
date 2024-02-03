@@ -1,10 +1,14 @@
 [
     {
         "game_version_name": "Monopoly NL",
-        "game_version_language": "Nederlands"
+        "game_version_language": "Nederlands",
+        "total_cash": 20580,
+        "starting_cash_balance": 1500
     },
     {
         "game_version_name": "Costco Monopoly",
-        "game_version_language": "English"
+        "game_version_language": "English",
+        "total_cash": 20580,
+        "starting_cash_balance": 1500
     }
 ]

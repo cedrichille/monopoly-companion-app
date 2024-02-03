@@ -1,5 +1,5 @@
 from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
-from monopoly_companion.db import get_db, init_property_ownership
+from monopoly_companion.db import get_db, init_property_ownership, starting_cash, get_property_value
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
@@ -31,7 +31,7 @@ def index():
             session['game_version_id'] = game_version['rowid']
             session['no_of_players'] = no_of_players
             
-            init_property_ownership(game_version['rowid'])
+            init_property_ownership(db, game_version['rowid'])
 
             return redirect(url_for('game_setup.player_registration'))
 
@@ -66,24 +66,49 @@ def player_registration():
             db.commit()
 
             # Need to do net worth dictionary calc and sql insert here and make it available to gameplay.py and gameplay.index.html
-            player_net_worths = {}
+            total_cash, starting_cash_per_player = db.execute(
+                "SELECT total_cash, starting_cash_balance FROM game_version where rowid = ?",
+                (session['game_version_id'],)
+            ).fetchone()
 
-            for player in player_names:
-                # get net worth figure. 
-                net_worth = db.execute(
-                    "SELECT net_worth FROM net_worth WHERE player_id = ?",
-                    (player_names.index(player),)
+            player_starting_cash = starting_cash(db, no_of_players, player_names, total_cash, starting_cash_per_player)
+
+            property_values = get_property_value(db, player_names)
+
+            player_names_incl_static = ["Bank", "Free Parking"] + player_names
+
+            for player in player_names_incl_static:
+                player_id = player_names_incl_static.index(player)+1
+                cash_balance = player_starting_cash[player_id][1]
+                net_property_value = property_values[player_id][3]
+                gross_property_value = property_values[player_id][4]
+                net_worth = cash_balance + net_property_value
+                db.execute(
+                    """
+                    INSERT INTO net_worth (turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value, net_worth) 
+                    VALUES (1, ?, ?, ?, 0, ?, ?)
+                    """,
+                    (player_id, cash_balance, net_property_value, gross_property_value, net_worth)
                 )
-                if not net_worth:
-                    error = "net_worth table didn't find player"
-                else:
-                    player_net_worths[player] = net_worth
+
+            db.commit()
+    
+            # for player in player_names:
+            #     # get net worth figure. 
+            #     net_worth = db.execute(
+            #         "SELECT net_worth FROM net_worth WHERE player_id = ?",
+            #         (player_names.index(player),)
+            #     )
+            #     if not net_worth:
+            #         error = "net_worth table didn't find player"
+            #     else:
+            #         player_net_worths[player] = net_worth
             session['player_names'] = player_names
             session['game_started'] = 1
-            session['net_worths'] = player_net_worths        
+            # session['net_worths'] = player_net_worths
 
-            return redirect(url_for("gameplay.index"),player_names=player_names, player_net_worths=player_net_worths)
-        
+            return redirect(url_for("gameplay.index"))
+  
     return render_template(
         "game_setup/player_registration.html",no_of_players=no_of_players
     )

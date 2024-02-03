@@ -22,51 +22,5 @@ def index():
     if request.method == "POST":
         print("hello")
 
-    return render_template ("gameplay/index.html")
+    return render_template ("gameplay/index.html", player_names=session['player_names'], player_net_worths=session['player_net_worths'])
 
-def next_turn():
-    return
-
-def previous_turn():
-    return
-
-def undo_action():
-    return
-
-# this section contains the functions for action-type database updates. This will make the code in index() easier to understand.
-def purchase_property():
-    # buy property 
-
-    return
-
-def trade_property():
-    # trade property (has more requirements, leave till end)
-    return
-
-def rent():
-    # pay rent to owner on property
-    return
-
-def go():
-    # pass or land on go
-    return
-
-def build():
-    # build a house or hotel
-    return
-
-def mortgage():
-    # mortgage or unmortgage a property
-    return
-
-def special_field():
-    # chance, community chest, or free parking
-    return
-
-def tax():
-    # income or luxury tax
-    return
-
-def jail():
-    # enter jail and leave jail
-    return

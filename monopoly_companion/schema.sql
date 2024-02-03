@@ -10,7 +10,9 @@ DROP TABLE IF EXISTS transactions;
 CREATE TABLE "game_version" (
   "game_version_id" INTEGER PRIMARY KEY,
   "game_version_name" VARCHAR NOT NULL,
-  "game_version_language" VARCHAR NOT NULL
+  "game_version_language" VARCHAR NOT NULL,
+  "total_cash" INTEGER NOT NULL,
+  "starting_cash_balance" INTEGER NOT NULL
 );  
 
 CREATE TABLE "property" (
