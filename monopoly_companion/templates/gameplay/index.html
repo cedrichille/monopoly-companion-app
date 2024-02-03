@@ -3,14 +3,21 @@
 Gameplay
 {% endblock %}
 {% block content %}
-<p>Gameplay content goes here</p>
+<div class="navbar">
+  {% for player in players.items() %}
+  <a><span>{{ player[1][0] }} <br> Cash Balance: ${{ net_worths[player[0]][0] }}; Net Worth: ${{ net_worths[player[0]][4] }}</span>
+  <hr>
+  {% endfor %}
+</div>
+
+<p>Current player: {{ current_player[0] }} &emsp; Turn: {{ current_turn }}</p>
+
 <nav>
-    <h1>Net worth</h1>
     <ul>
-      /* {% for player, net_worth in player_net_worths.items() %}
-        <li><span>{{ player }}: {{ net_worth }}</span>
+      {% for player in players.items() %}
+        <li><span>Name: {{ player[1][0] }}. Order: {{ player[1][1] }}. Cash Balance: ${{ net_worths[player[0]][0] }}. Net Worth: ${{ net_worths[player[0]][4] }}</span>
       {% endfor %}
     </ul>
-  </nav>
+</nav>
 
 {% endblock %}

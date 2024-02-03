@@ -40,7 +40,18 @@ def init_data(db):
     for df in df_tables:
         data = pd.read_json(current_app.open_resource('static/' + df + '.json'))
         data.to_sql(df, con=db, if_exists="replace", index=False)
-
+    
+    db.executescript(
+        """
+        DELETE FROM special_counter;
+        DELETE FROM net_worth;
+        DELETE FROM transactions;
+        DELETE FROM property_ownership;
+        VACUUM;
+        """
+    )
+ 
+    db.commit()
     return
 
 def init_property_ownership(db, game_version_id):
@@ -49,15 +60,15 @@ def init_property_ownership(db, game_version_id):
         (game_version_id,)
         ).fetchall()
     
-    ownership_not_empty = db.execute(
-        "SELECT EXISTS (SELECT 1 FROM property_ownership)"
-        ).fetchall()
-    print(ownership_not_empty[0][0])
-    if ownership_not_empty[0][0] == 1:
-        db.execute(
-            "DELETE FROM property_ownership"
-        )
-        db.commit()
+    # commented out because syntax could be useful in another case but we already delete property_ownership data in init_data
+    # ownership_not_empty = db.execute(
+    #     "SELECT EXISTS (SELECT 1 FROM property_ownership)"
+    #     ).fetchall()
+    # print(ownership_not_empty[0][0])
+    # if ownership_not_empty[0][0] == 1:
+    #     db.execute(
+    #         "DELETE FROM property_ownership"
+    #     )
 
     for prop in properties:
         db.execute(
@@ -140,13 +151,6 @@ def starting_cash(db, no_of_players, player_names, total_cash, starting_cash_per
             player_starting_cash[player_names_incl_static.index(player)+1] = [player, starting_cash_per_player] 
 
     return player_starting_cash
-
-def get_cash_balance(db):
-    # get rows with cash balances per player
-    
-    cash_balances = db.execute(
-        ""
-    )
 
 def get_gross_property_value(db):
     # get all rows with player_id and sum of property price (value) owned by that player
@@ -241,9 +245,10 @@ def get_property_value(db, player_names):
     mortgaged_property_value = get_mortgaged_property_value(db)
     unmortgaged_property_value = get_unmortgaged_property_value(db)
     gross_property_value = get_gross_property_value(db)
-    
+    improvement_value = get_improvement_value(db)
+        
     for player in player_names_incl_static:
-        property_value[player_names_incl_static.index(player)+1] = [0, 0, 0, 0, 0]
+        property_value[player_names_incl_static.index(player)+1] = [0, 0, 0, 0, 0, 0]
         property_value[player_names_incl_static.index(player)+1][0] = player
 
     for row in mortgaged_property_value:
@@ -258,12 +263,70 @@ def get_property_value(db, player_names):
     for row in gross_property_value:
         property_value[row['rowid']][4] = row['gross_property_value']
 
+    for row in improvement_value:
+        property_value[row['rowid']][5] = row['improvement_value']
+
     return property_value
 
 def get_improvement_value(db):
-    # logic for value of houses and hotels
+    # get all rows with player_id and the sum of the value of all houses and hotels on property owned by that player
+    improvement_values = db.execute(
+        """
+        SELECT
+        players.rowid,
+        IFNULL(CASE WHEN property_ownership.hotels = 1 THEN SUM(5* property.house_cost) ELSE SUM(property_ownership.houses * property.house_cost) END, 0) AS improvement_value
+        FROM 
+        players
+        LEFT JOIN 
+        property_ownership
+        ON
+        players.rowid = property_ownership.owner_player_id
+        LEFT JOIN
+        property
+        ON
+        property_ownership.property_id = property.rowid
+        GROUP BY
+        players.rowid
+        ORDER BY 
+        players.rowid ASC 
+        """
+    ).fetchall()
 
-    return
+    return improvement_values
+
+def get_net_worth(db):
+    # get most recent net_worth row for all players to represent current net_worth
+
+    current_net_worths = {}
+
+    current_net_worth_table = db.execute(
+        """
+        SELECT 
+        max(net_worth_time),
+        player_id,
+        cash_balance,
+        net_property_value,
+        improvement_value,
+        gross_property_value,
+        net_worth
+        FROM
+        net_worth
+        GROUP BY
+        player_id
+        ORDER BY 
+        player_id
+        """
+    ).fetchall()
+
+    for row in current_net_worth_table:
+        current_net_worths[row['player_id']] = [0, 0, 0, 0, 0]
+        current_net_worths[row['player_id']][0] = row['cash_balance']
+        current_net_worths[row['player_id']][1] = row['net_property_value']
+        current_net_worths[row['player_id']][2] = row['improvement_value']
+        current_net_worths[row['player_id']][3] = row['gross_property_value']
+        current_net_worths[row['player_id']][4] = row['net_worth']
+        
+    return current_net_worth_table, current_net_worths
 
 def update_net_worth(db):
     return

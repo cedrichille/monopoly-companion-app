@@ -5,22 +5,22 @@ bp = Blueprint('gameplay',__name__, static_folder='static')
 
 @bp.route("/", methods=("GET","POST"))
 def index():
-    if session['game_started'] == 1:
-        current_turn = session['current_turn']
-        current_player = session['current_player']
-        current_player_order = session['current_player_order']
-    else:
-        current_turn = 1
-        current_player = session['player_names'][0]
-        current_player_order = 1
-    
     db = get_db()
     error = None
-    
+
+    if not session['game_started']:
+        error = "Game not started. Please go to Game Setup to begin."
+    else:
+        player_dict = session['player_dict']
+        current_turn = session['current_turn']
+        current_player = session['current_player']
+        current_net_worths = session['net_worths']
+
+
 
     
-    if request.method == "POST":
-        print("hello")
+        if request.method == "POST":
+            print("hello")
 
-    return render_template ("gameplay/index.html", player_names=session['player_names'], player_net_worths=session['player_net_worths'])
+    return render_template ("gameplay/index.html", players=player_dict, current_turn=current_turn, current_player=current_player, net_worths=current_net_worths)
 

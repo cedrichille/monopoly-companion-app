@@ -8,13 +8,14 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('welcome.index') }}" class="navbar-brand">Home</a>
+        <a class="navbar-brand">Monopoly Companion App</a>
     </div>
 
     <div class="sidebar">
         <a class="active" href="{{ url_for('welcome.index') }}">Home</a>
         <a href="{{ url_for('game_setup.index') }}">Game Setup</a>
         <a href="{{ url_for('game_setup.player_registration') }}">Player Registration</a>
+        <a href="{{ url_for('gameplay.index') }}">Game Hub</a>
     </div>
 
     <div class="body-content">
