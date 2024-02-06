@@ -1,0 +1,17 @@
+action_type_id,action_type_name,exchange_type
+1,purchase property,cash and property
+2,rent,cash
+3,pass go,cash
+4,land on go,cash
+5,build house,cash and improvement
+6,build hotel,cash and improvement
+7,mortgage property,cash and property
+8,unmortgage property,cash and property
+9,trade property,cash and property
+10,chance,cash
+11,community chest,cash
+12,free parking,cash
+13,jail,none
+14,leave jail,cash or card
+15,income tax,cash
+16,luxury tax,cash

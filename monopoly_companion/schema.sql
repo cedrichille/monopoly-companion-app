@@ -1,6 +1,3 @@
-/* PostgreSQL schema of database
-*/
-
 DROP TABLE IF EXISTS players;
 DROP TABLE IF EXISTS special_counter;
 DROP TABLE IF EXISTS property_ownership;
@@ -22,36 +19,37 @@ CREATE TABLE "property" (
   "property_type" VARCHAR NOT NULL,
   "city" VARCHAR NOT NULL,
   "board_side" INTEGER NOT NULL,
-  "color" VARCHAR NOT NULL,
-  "house_cost" INTEGER NOT NULL,
+  "color" VARCHAR,
+  "house_cost" INTEGER,
   "price" INTEGER NOT NULL,
   "mortgage_value" INTEGER NOT NULL,
   "unmortgage_cost" INTEGER NOT NULL,
-  "rent_basic" INTEGER NOT NULL,
-  "rent_one_house" INTEGER NOT NULL,
-  "rent_one_houses" INTEGER NOT NULL,
-  "rent_three_houses" INTEGER NOT NULL,
-  "rent_four_houses" INTEGER NOT NULL,
-  "rent_hotel" INTEGER NOT NULL,
-  "rent_multiplier_one_owned" INTEGER NOT NULL,
-  "rent_multiplier_two_owned" INTEGER NOT NULL,
-  "rent_two_owned" INTEGER NOT NULL,
-  "rent_three_owned" INTEGER NOT NULL,
-  "rent_four_owned" INTEGER NOT NULL,
-  FOREIGN KEY (game_version_id) REFERENCES game_version (game_version_id)
+  "rent_basic" INTEGER,
+  "rent_one_house" INTEGER,
+  "rent_two_houses" INTEGER,
+  "rent_three_houses" INTEGER,
+  "rent_four_houses" INTEGER,
+  "rent_hotel" INTEGER,
+  "rent_multiplier_one_owned" INTEGER,
+  "rent_multiplier_two_owned" INTEGER,
+  "rent_two_owned" INTEGER,
+  "rent_three_owned" INTEGER,
+  "rent_four_owned" INTEGER,
+  "rent_monopoly" INTEGER,
+  FOREIGN KEY ("game_version_id") REFERENCES "game_version" ("game_version_id")
 );
 
 CREATE TABLE "action_type" (
   "action_type_id" INTEGER PRIMARY KEY,
   "action_type_name" VARCHAR NOT NULL,
-  "exchange_type" VARCHAR NOT NULL
+  "exchange_type" VARCHAR 
 );
 
 CREATE TABLE "players" (
   "player_id" INTEGER PRIMARY KEY,
   "player_name" VARCHAR NOT NULL,
-  "player_piece" VARCHAR NOT NULL,
-  "player_order" INTEGER NOT NULL
+  "player_piece" VARCHAR,
+  "player_order" INTEGER
 );
 
 CREATE TABLE "special_counter" (
@@ -59,25 +57,27 @@ CREATE TABLE "special_counter" (
   "counter_time" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "turn" INTEGER NOT NULL,
   "player_id" INTEGER NOT NULL,
-  "jail_counter" INTEGER NOT NULL,
-  "free_parking_counter" INTEGER NOT NULL,
-  "income_tax_counter" INTEGER NOT NULL,
-  "luxury_tax_counter" INTEGER NOT NULL,
-  "land_on_start_counter" INTEGER NOT NULL,
-  "chance_counter" INTEGER NOT NULL,
-  "community_chest_counter" INTEGER NOT NULL,
-  FOREIGN KEY (player_id) REFERENCES players (player_id)
+  "jail_counter" INTEGER,
+  "free_parking_counter" INTEGER,
+  "income_tax_counter" INTEGER,
+  "luxury_tax_counter" INTEGER,
+  "land_on_start_counter" INTEGER,
+  "chance_counter" INTEGER,
+  "community_chest_counter" INTEGER,
+  FOREIGN KEY ("player_id") REFERENCES "players" ("player_id")
 );
 
 CREATE TABLE "property_ownership" (
   "property_id" INTEGER PRIMARY KEY,
   "owner_player_id" INTEGER NOT NULL,
-  "mortgaged" boolean,
+  "mortgaged" boolean NOT NULL,
   "houses" INTEGER NOT NULL,
   "hotels" INTEGER NOT NULL,
   "number_owned" INTEGER NOT NULL,
-  FOREIGN KEY (property_id) REFERENCES property (property_id),
-  FOREIGN KEY (owner_player_id) REFERENCES players (player_id)
+  "max_number_owned" INTEGER NOT NULL,
+  "monopoly" boolean AS (CASE WHEN "number_owned" = "max_number_owned" THEN TRUE ELSE FALSE END) STORED,
+  FOREIGN KEY ("property_id") REFERENCES "property" ("property_id"),
+  FOREIGN KEY ("owner_player_id") REFERENCES "players" ("player_id")
 );
 
 CREATE TABLE "net_worth" (
@@ -89,8 +89,8 @@ CREATE TABLE "net_worth" (
   "net_property_value" INTEGER NOT NULL,
   "improvement_value" INTEGER NOT NULL,
   "gross_property_value" INTEGER NOT NULL,
-  "net_worth" INTEGER NOT NULL,
-  FOREIGN KEY (player_id) REFERENCES players (player_id)  
+  "net_worth" INTEGER AS ("cash_balance" + "net_property_value" + "improvement_value") STORED,
+  FOREIGN KEY ("player_id") REFERENCES "players" ("player_id")  
 );
 
 CREATE TABLE "transactions" (
@@ -102,10 +102,10 @@ CREATE TABLE "transactions" (
   "action_type_id" INTEGER NOT NULL,
   "property_id" INTEGER NOT NULL,
   "transaction_value" INTEGER NOT NULL,
-  FOREIGN KEY (property_id) REFERENCES property (property_id),
-  FOREIGN KEY (action_type_id) REFERENCES action_type (action_type_id),
-  FOREIGN KEY (party_player_id) REFERENCES players (player_id),
-  FOREIGN KEY (counterparty_player_id) REFERENCES players (player_id)
+  FOREIGN KEY ("property_id") REFERENCES "property" ("property_id"),
+  FOREIGN KEY ("action_type_id") REFERENCES "action_type" ("action_type_id"),
+  FOREIGN KEY ("party_player_id") REFERENCES "players" ("player_id"),
+  FOREIGN KEY ("counterparty_player_id") REFERENCES "players" ("player_id")
 
 );
 

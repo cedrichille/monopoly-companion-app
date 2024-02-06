@@ -36,13 +36,12 @@ def init_app(app):
     app.cli.add_command(init_db_command)
     
 def init_data(db):
-    df_tables = ['action_type','game_version','players','property']
-    for df in df_tables:
-        data = pd.read_json(current_app.open_resource('static/' + df + '.json'))
-        data.to_sql(df, con=db, if_exists="replace", index=False)
-    
     db.executescript(
         """
+        DELETE FROM action_type;
+        DELETE FROM game_version;
+        DELETE FROM players;
+        DELETE FROM property;
         DELETE FROM special_counter;
         DELETE FROM net_worth;
         DELETE FROM transactions;
@@ -50,13 +49,17 @@ def init_data(db):
         VACUUM;
         """
     )
- 
+    df_tables = ['action_type', 'game_version', 'players', 'property']
+    for df in df_tables:
+        data = pd.read_csv(current_app.open_resource('static/' + df + '.csv'))
+        data.to_sql(df, con=db, if_exists="append", index=False)
+
     db.commit()
     return
 
 def init_property_ownership(db, game_version_id):
     properties = db.execute(
-        "SELECT rowid, * FROM property WHERE game_version_id = ?",
+        "SELECT * FROM property WHERE game_version_id = ?",
         (game_version_id,)
         ).fetchall()
     
@@ -72,14 +75,49 @@ def init_property_ownership(db, game_version_id):
 
     for prop in properties:
         db.execute(
-            "INSERT INTO property_ownership VALUES (?, 1, FALSE, 0, 0, 0)",
-            (prop['rowid'],)
+            "INSERT INTO property_ownership VALUES (?, 1, FALSE, 0, 0, 0, FALSE)",
+            (prop['property_id'],)
         )
     db.commit()
 
     update_number_owned(db)
+    update_max_number_owned(db)
 
     return 
+
+def update_max_number_owned(db):
+    # update the "max_number_owned" field in the property_ownership table to enable comparison to number owned to determine "monopoly" column
+    # only needs to be called once at the beginning
+    cities = db.execute(
+        """
+        SELECT DISTINCT city from property 
+        """
+    ).fetchall()
+    
+    for row in cities:
+        db.execute(
+            """
+            UPDATE property_ownership
+            SET max_number_owned = 
+                (SELECT 
+                COUNT(property.property_id) AS max_number_owned_in_city
+                from 
+                property
+                WHERE
+                property.city = ?)
+            WHERE property_id IN 
+                (SELECT
+                property_id
+                FROM
+                property
+                WHERE
+                property.city = ?)
+            """,
+            (row['city'], row['city'])
+        )
+
+    db.commit()
+    return
 
 def update_number_owned(db):
     # get a joined table containing owner id-city combos with counts
@@ -88,13 +126,13 @@ def update_number_owned(db):
         SELECT 
         property_ownership.owner_player_id,
         property.city,
-        COUNT(property.rowid) AS number_owned_in_city
+        COUNT(property.property_id) AS number_owned_in_city
         from 
         property_ownership 
         LEFT JOIN 
         property
         ON
-        property_ownership.property_id = property.rowid
+        property_ownership.property_id = property.property_id
         GROUP BY
         property.city,
         property_ownership.owner_player_id;
@@ -118,9 +156,9 @@ def update_number_owned(db):
             WHERE
             owner_player_id = ? 
             AND 
-            rowid IN 
+            property_id IN 
                 (SELECT
-                rowid
+                property_id
                 FROM
                 property
                 WHERE
@@ -158,22 +196,22 @@ def get_gross_property_value(db):
     gross_property_value = db.execute(
         """
         SELECT
-        players.rowid,
+        players.player_id,
         IFNULL(SUM(property.price), 0) AS gross_property_value
         from 
         players
         LEFT JOIN 
         property_ownership
         ON
-        players.rowid = property_ownership.owner_player_id
+        players.player_id = property_ownership.owner_player_id
         LEFT JOIN
         property
         ON
-        property_ownership.property_id = property.rowid
+        property_ownership.property_id = property.property_id
         GROUP BY
         property_ownership.owner_player_id
         ORDER BY 
-        players.rowid ASC 
+        players.player_id ASC 
         """
     ).fetchall()
 
@@ -184,24 +222,24 @@ def get_mortgaged_property_value(db):
     mortgaged_property_value = db.execute(
         """
         SELECT
-        players.rowid,
+        players.player_id,
         IFNULL(SUM(property.mortgage_value), 0) AS mortgaged_property_value
         FROM 
         players
         LEFT JOIN 
         property_ownership
         ON
-        players.rowid = property_ownership.owner_player_id
+        players.player_id = property_ownership.owner_player_id
         LEFT JOIN
         property
         ON
-        property_ownership.property_id = property.rowid
+        property_ownership.property_id = property.property_id
         WHERE 
         property_ownership.mortgaged = TRUE        
         GROUP BY
         property_ownership.owner_player_id
         ORDER BY 
-        players.rowid ASC 
+        players.player_id ASC 
         """
     ).fetchall()
 
@@ -212,24 +250,24 @@ def get_unmortgaged_property_value(db):
     unmortgaged_property_value = db.execute(
         """
         SELECT
-        players.rowid,
+        players.player_id,
         IFNULL(SUM(property.price), 0) AS unmortgaged_property_value
         FROM 
         players
         LEFT JOIN 
         property_ownership
         ON
-        players.rowid = property_ownership.owner_player_id
+        players.player_id = property_ownership.owner_player_id
         LEFT JOIN
         property
         ON
-        property_ownership.property_id = property.rowid
+        property_ownership.property_id = property.property_id
         WHERE 
         property_ownership.mortgaged = FALSE        
         GROUP BY
         property_ownership.owner_player_id
         ORDER BY 
-        players.rowid ASC 
+        players.player_id ASC 
         """
     ).fetchall()
 
@@ -252,19 +290,19 @@ def get_property_value(db, player_names):
         property_value[player_names_incl_static.index(player)+1][0] = player
 
     for row in mortgaged_property_value:
-        property_value[row['rowid']][1] = row['mortgaged_property_value']
+        property_value[row['player_id']][1] = row['mortgaged_property_value']
 
     for row in unmortgaged_property_value:
-        property_value[row['rowid']][2] = row['unmortgaged_property_value']
+        property_value[row['player_id']][2] = row['unmortgaged_property_value']
     
     for key in property_value.keys():
         property_value[key][3] = property_value[key][1] + property_value[key][2]
 
     for row in gross_property_value:
-        property_value[row['rowid']][4] = row['gross_property_value']
+        property_value[row['player_id']][4] = row['gross_property_value']
 
     for row in improvement_value:
-        property_value[row['rowid']][5] = row['improvement_value']
+        property_value[row['player_id']][5] = row['improvement_value']
 
     return property_value
 
@@ -273,22 +311,22 @@ def get_improvement_value(db):
     improvement_values = db.execute(
         """
         SELECT
-        players.rowid,
+        players.player_id,
         IFNULL(CASE WHEN property_ownership.hotels = 1 THEN SUM(5* property.house_cost) ELSE SUM(property_ownership.houses * property.house_cost) END, 0) AS improvement_value
         FROM 
         players
         LEFT JOIN 
         property_ownership
         ON
-        players.rowid = property_ownership.owner_player_id
+        players.player_id = property_ownership.owner_player_id
         LEFT JOIN
         property
         ON
-        property_ownership.property_id = property.rowid
+        property_ownership.property_id = property.property_id
         GROUP BY
-        players.rowid
+        players.player_id
         ORDER BY 
-        players.rowid ASC 
+        players.player_id ASC 
         """
     ).fetchall()
 
@@ -355,9 +393,18 @@ def undo_action():
     return
 
 # this section contains the functions for action-type database updates. This will make the code in index() easier to understand.
-def purchase_property():
-    # buy property 
+def record_transaction(turn, party_player_id, counterparty_player_id, action_type,id, transaction_value, property_id=None):
+    return
 
+
+def purchase_property(current_player_id, property_name):
+    # buy property from the bank
+
+    # get the price
+    # create new row in net_worth with subtracted price from player cash and added price to net and gross property values 
+    # assign ownership to player    
+    # add the transaction to transactions table
+    record_transaction(TBD)
     return
 
 def trade_property():

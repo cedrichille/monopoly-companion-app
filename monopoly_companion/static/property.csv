@@ -1,0 +1,29 @@
+property_id,game_version_id,property_name,property_type,city,board_side,color,house_cost,price,mortgage_value,unmortgage_cost,rent_basic,rent_one_house,rent_two_houses,rent_three_houses,rent_four_houses,rent_hotel,rent_multiplier_one_owned,rent_multiplier_two_owned,rent_two_owned,rent_three_owned,rent_four_owned,rent_monopoly
+1,1,Dorpsstraat,Street,Ons Dorp,1,Brown,50,60,30,33,2,10,30,90,160,250,,,,,,4
+2,1,Brink,Street,Ons Dorp,1,Brown,50,60,30,33,4,20,60,180,320,450,,,,,,8
+3,1,Steenstraat,Street,Arnhem,1,Light Blue,50,100,50,55,6,30,90,270,400,550,,,,,,12
+4,1,Ketelstraat,Street,Arnhem,1,Light Blue,50,100,50,55,6,30,90,270,400,550,,,,,,12
+5,1,Velperplein,Street,Arnhem,1,Light Blue,50,120,60,66,8,40,100,300,450,600,,,,,,16
+6,1,Barteljorisstraat,Street,Haarlem,2,Pink,100,140,70,77,10,50,150,450,625,750,,,,,,20
+7,1,Zijlweg,Street,Haarlem,2,Pink,100,140,70,77,10,50,150,450,625,750,,,,,,20
+8,1,Houtstraat,Street,Haarlem,2,Pink,100,160,80,88,12,60,180,500,700,900,,,,,,24
+9,1,Neude,Street,Utrecht,2,Orange,100,180,90,99,14,70,200,550,750,950,,,,,,28
+10,1,Biltstraat,Street,Utrecht,2,Orange,100,180,90,99,14,70,200,550,750,950,,,,,,28
+11,1,Vreeburg,Street,Utrecht,2,Orange,100,200,100,110,16,80,220,600,800,1000,,,,,,32
+12,1,A-Kerkhof,Street,Groningen,3,Red,150,220,110,121,18,90,250,700,875,1050,,,,,,36
+13,1,Grote Markt,Street,Groningen,3,Red,150,220,110,121,18,90,250,700,875,1050,,,,,,36
+14,1,Herestraat,Street,Groningen,3,Red,150,240,120,132,20,100,300,750,925,1100,,,,,,40
+15,1,Spui,Street,Den Haag,3,Yellow,150,260,130,143,22,110,330,800,975,1150,,,,,,44
+16,1,Plein,Street,Den Haag,3,Yellow,150,260,130,143,22,110,330,800,975,1150,,,,,,44
+17,1,Lange Poten,Street,Den Haag,3,Yellow,150,280,140,154,24,120,360,850,1025,1200,,,,,,48
+18,1,Hofplein,Street,Rotterdam,4,Green,200,300,150,165,26,130,390,900,1100,1275,,,,,,52
+19,1,Blaak,Street,Rotterdam,4,Green,200,300,150,165,26,130,390,900,1100,1275,,,,,,52
+20,1,Coolsingel,Street,Rotterdam,4,Green,200,320,160,176,28,150,450,1000,1200,1400,,,,,,56
+21,1,Leidsestraat,Street,Amsterdam,4,Dark Blue,200,350,175,193,35,175,500,1100,1300,1500,,,,,,70
+22,1,Kalverstraat,Street,Amsterdam,4,Dark Blue,200,400,200,220,50,200,600,1400,1700,2000,,,,,,100
+23,1,Zuid,Station,Station,1,,,200,100,110,25,,,,,,,,50,100,200,200
+24,1,West,Station,Station,2,,,200,100,110,25,,,,,,,,50,100,200,200
+25,1,Noord,Station,Station,3,,,200,100,110,25,,,,,,,,50,100,200,200
+26,1,Oost,Station,Station,4,,,200,100,110,25,,,,,,,,50,100,200,200
+27,1,Elektriciteitsbedrijf,Utility,Utility,2,,,150,75,83,,,,,,,4,10,,,,
+28,1,Waterleidingbedrijf,Utility,Utility,3,,,150,75,83,,,,,,,4,10,,,,

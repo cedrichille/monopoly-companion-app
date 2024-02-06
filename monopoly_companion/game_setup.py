@@ -20,7 +20,7 @@ def index():
 
         if error is None:
             game_version = db.execute(
-                "SELECT rowid,* FROM game_version WHERE game_version_name = ?",
+                "SELECT * FROM game_version WHERE game_version_name = ?",
                 (game_version_name,)
             ).fetchone()
 
@@ -28,10 +28,10 @@ def index():
             error = 'Game version not found'
         else:
             session.clear()
-            session['game_version_id'] = game_version['rowid']
+            session['game_version_id'] = game_version['game_version_id']
             session['no_of_players'] = no_of_players
             
-            init_property_ownership(db, game_version['rowid'])
+            init_property_ownership(db, game_version['game_version_id'])
 
             return redirect(url_for('game_setup.player_registration'))
 
@@ -84,13 +84,12 @@ def player_registration():
                 net_property_value = property_values[player_id][3]
                 gross_property_value = property_values[player_id][4]
                 improvement_value = property_values[player_id][5]
-                net_worth = cash_balance + improvement_value + net_property_value
                 db.execute(
                     """
-                    INSERT INTO net_worth (turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value, net_worth) 
-                    VALUES (1, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO net_worth (turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value) 
+                    VALUES (1, ?, ?, ?, ?, ?)
                     """,
-                    (player_id, cash_balance, net_property_value, improvement_value, gross_property_value, net_worth)
+                    (player_id, cash_balance, net_property_value, improvement_value, gross_property_value)
                 )
 
             db.commit()
