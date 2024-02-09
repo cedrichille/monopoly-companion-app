@@ -171,7 +171,7 @@ def update_number_owned(db):
 
     return 
 
-def starting_cash(db, no_of_players, player_names, total_cash, starting_cash_per_player):
+def starting_cash(no_of_players, player_names, total_cash, starting_cash_per_player):
     # at the beginning of the game, calculate the starting cash values of the bank, based on number of players and starting cash per player  
     # create a dictionary with keys = player_ids and value a list with name and starting cash
     player_names_incl_static = ["Bank", "Free Parking"] + player_names    
@@ -340,7 +340,8 @@ def get_net_worth(db):
     current_net_worth_table = db.execute(
         """
         SELECT 
-        max(net_worth_time),
+        net_worth_id,
+        net_worth_time,
         player_id,
         cash_balance,
         net_property_value,
@@ -349,10 +350,6 @@ def get_net_worth(db):
         net_worth
         FROM
         net_worth
-        GROUP BY
-        player_id
-        ORDER BY 
-        player_id
         """
     ).fetchall()
 
@@ -366,7 +363,12 @@ def get_net_worth(db):
         
     return current_net_worth_table, current_net_worths
 
-def update_net_worth(db):
+def log_net_worth(db=None):
+    # add rows to net_worth_log table that contain the most recent net_worth data. This is to be used whenever a turn ends.
+    if db is None:
+        db = get_db()
+
+    # copy all data from net_worth to log_net_worth 
     return
 
 def next_player(current_player_order, no_of_players, turn):
@@ -375,6 +377,7 @@ def next_player(current_player_order, no_of_players, turn):
     if current_player_order == no_of_players:
         current_player_order = 1 
         turn += 1
+        log_net_worth() # think about how to unlog net_worth when previous_player or undo_action
     else:
         current_player_order += 1
     return current_player_order, turn
@@ -393,26 +396,138 @@ def undo_action():
     return
 
 # this section contains the functions for action-type database updates. This will make the code in index() easier to understand.
-def record_transaction(turn, party_player_id, counterparty_player_id, action_type,id, transaction_value, property_id=None):
+def record_transaction(db, turn, party_player_id, counterparty_player_id, action_type_id, property_id=None, cash_received=None, cash_paid=None, asset_value_received=None, asset_value_paid=None):
+    db.execute(
+        """
+        INSERT INTO transactions (turn, party_player_id, counterparty_player_id, action_type_id, property_id, cash_received, cash_paid, asset_value_received, asset_value_paid)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (turn, party_player_id, counterparty_player_id, action_type_id, property_id, cash_received, cash_paid, asset_value_received, asset_value_paid)
+    )
     return
 
-
-def purchase_property(current_player_id, property_name):
+def purchase_property(db, current_player_id, property_name, turn):
     # buy property from the bank
 
     # get the price
-    # create new row in net_worth with subtracted price from player cash and added price to net and gross property values 
+    property_id, price = db.execute(
+        "SELECT property_id, price FROM property WHERE property_name = ?",
+        (property_name,)
+    ).fetchone()
+
+    # update net_worth with subtracted price from player cash and added price to net and gross property values 
+    db.execute(
+        """
+        UPDATE net_worth
+        SET turn = ?,
+            cash_balance = cash_balance - ?,
+            net_property_value = net_property_value + ?,
+            gross_property_value = gross_property_value + ?
+        WHERE player_id = ?
+        """,
+        (turn, price, price, price, current_player_id)
+    )
+    
     # assign ownership to player    
+    db.execute(
+        """
+        UPDATE property_ownership
+        SET owner_player_id = ?
+        WHERE property_id = ?
+        """,
+        (current_player_id, property_id)
+    )
+    update_number_owned(db)
+    
     # add the transaction to transactions table
-    record_transaction(TBD)
+    record_transaction(db, turn, current_player_id, 1, 1, property_id, None, price, price, None)
+    db.commit()
     return
 
 def trade_property():
     # trade property (has more requirements, leave till end)
     return
 
-def rent():
+def rent(db, current_player_id, property_name, turn):
     # pay rent to owner on property
+
+    # get rent due (consider mortgaged, monopoly, houses, and hotels)
+    property_details = db.execute(
+        "SELECT * FROM property LEFT JOIN property_ownership on property.property_id = property_ownership.property_id WHERE property.property_name = ?",
+        (property_name,)
+    ).fetchall()
+
+    if property_details['owner_player_id'] == 1:
+        rent_due = 0
+        comment = "Property owned by bank! No rent due."
+
+    elif property_details['mortgaged'] == True:
+        rent_due = 0
+        comment = "Property mortgaged! No rent due."
+    
+    elif property_details['hotels'] == 1:
+        rent_due = property_details['rent_hotel']
+        comment = "Property with Hotel: " + str(rent_due) + " due."
+
+    elif property_details['houses'] > 0:
+        if property_details['houses'] == 1:
+            rent_due = property_details['rent_one_house']
+            comment = "Property with one house: " + str(rent_due) + " due."
+        if property_details['houses'] == 2:
+            rent_due = property_details['rent_two_houses']
+            comment = "Property with two houses: " + str(rent_due) + " due."            
+        if property_details['houses'] == 3:
+            rent_due = property_details['rent_three_houses']
+            comment = "Property with three houses: " + str(rent_due) + " due."  
+        if property_details['houses'] == 4:
+            rent_due = property_details['rent_four_houses']
+            comment = "Property with four houses: " + str(rent_due) + " due."    
+
+    elif property_details['monopoly'] and property_details['property_type'] == "Street":
+        rent_due = property_details['rent_monopoly']
+        comment = "Property in a Monopoly: " + str(rent_due) + " due."
+    
+    elif property_details['property_type'] == "Station" and property_details['number_owned'] > 1:
+        if property_details['number_owned'] == 2:
+            rent_due = property_details['rent_two_owned']
+            comment = "Two stations owned: " + str(rent_due) + " due."
+        elif property_details['number_owned'] == 3:
+            rent_due = property_details['rent_three_owned']
+            comment = "Three stations owned: " + str(rent_due) + " due."
+        elif property_details['number_owned'] == 4:
+            rent_due = property_details['rent_four_owned']
+            comment = "Four stations owned: " + str(rent_due) + " due."
+        
+    elif property_details['property_type'] == "Utility":
+        if property_details['number_owned'] == 1:
+            rent_due = property_details['rent_multiplier_one_owned']
+            comment = "One utility owned. Multiply the dice roll by: " + str(rent_due) + "."
+        else:
+            rent_due = property_details['rent_multiplier_two_owned']
+            comment = "Two utilities owned. Multiply the dice roll by: " + str(rent_due) + "."
+    
+    else:
+        rent_due = property_details['rent_basic']
+        comment = "Rent due: " + str(rent_due) + "."
+
+    # update net_worth with cash exchange
+    db.execute(
+        """
+        UPDATE net_worth
+        SET turn = ?, 
+            cash_balance = CASE
+            WHEN player_id = ? THEN cash_balance + ?
+            WHEN player_id = ? THEN cash_balance - ?
+            END
+        WHERE player_id IN (?,?)
+        """,
+        (turn, property_details['owner_player_id'], rent_due, current_player_id, rent_due, property_details['owner_player_id'], current_player_id)
+    )
+    
+    # add the transaction to transactions table
+    record_transaction(db, turn, current_player_id, property_details['owner_player_id'], 2, property_details['property_id'], cash_paid=rent_due)
+    db.commit()
+
     return
 
 def go():

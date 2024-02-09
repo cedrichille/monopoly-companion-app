@@ -66,13 +66,12 @@ def player_registration():
                 )
                 player_dict[int(player_names.index(player)+3)] = [player, player_names.index(player)+1]
 
-            # Need to do net worth dictionary calc and sql insert here and make it available to gameplay.py and gameplay.index.html
             total_cash, starting_cash_per_player = db.execute(
                 "SELECT total_cash, starting_cash_balance FROM game_version where rowid = ?",
                 (session['game_version_id'],)
             ).fetchone()
 
-            player_starting_cash = starting_cash(db, no_of_players, player_names, total_cash, starting_cash_per_player)
+            player_starting_cash = starting_cash(no_of_players, player_names, total_cash, starting_cash_per_player)
 
             property_values = get_property_value(db, player_names)
 

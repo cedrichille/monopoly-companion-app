@@ -45,9 +45,12 @@ Dependencies:
 - Bootstrap-Flask
 
 ## Parking Lot
-- PRIORITY - add starting cash balance to game_version and insert into net_worth table when players are registered
+- PRIORITY 
+- unlog last net_worth_log addition
+- undo last transaction   
 - Names have to be unique
 - Player order has to be unique
 - Max number of players
 - Once registration is done, have to start over to make changes, or create a dedicated edit screen. 
-- Storing turn information between stats views etc. Maybe not an issue if we only have stats templates without an additional route. 
+- Storing turn information between stats views etc. Maybe not an issue if we only have stats templates without an additional route
+- Clear tables when session ends 

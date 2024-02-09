@@ -93,6 +93,19 @@ CREATE TABLE "net_worth" (
   FOREIGN KEY ("player_id") REFERENCES "players" ("player_id")  
 );
 
+CREATE TABLE "net_worth_log" (
+  "net_worth_id" INTEGER PRIMARY KEY,
+  "net_worth_time" TIMESTAMP NOT NULL,
+  "turn" INTEGER NOT NULL,
+  "player_id" INTEGER NOT NULL,
+  "cash_balance" INTEGER NOT NULL,
+  "net_property_value" INTEGER NOT NULL,
+  "improvement_value" INTEGER NOT NULL,
+  "gross_property_value" INTEGER NOT NULL,
+  "net_worth" INTEGER NOT NULL,
+  FOREIGN KEY ("player_id") REFERENCES "players" ("player_id")  
+);
+
 CREATE TABLE "transactions" (
   "transaction_id" INTEGER PRIMARY KEY,
   "transaction_time" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -100,13 +113,15 @@ CREATE TABLE "transactions" (
   "party_player_id" INTEGER NOT NULL,
   "counterparty_player_id" INTEGER NOT NULL,
   "action_type_id" INTEGER NOT NULL,
-  "property_id" INTEGER NOT NULL,
-  "transaction_value" INTEGER NOT NULL,
+  "property_id" INTEGER,
+  "cash_received" INTEGER,
+  "cash_paid" INTEGER,
+  "asset_value_received" INTEGER,
+  "asset_value_paid" INTEGER,
   FOREIGN KEY ("property_id") REFERENCES "property" ("property_id"),
   FOREIGN KEY ("action_type_id") REFERENCES "action_type" ("action_type_id"),
   FOREIGN KEY ("party_player_id") REFERENCES "players" ("player_id"),
   FOREIGN KEY ("counterparty_player_id") REFERENCES "players" ("player_id")
-
 );
 
 /*
