@@ -1,5 +1,5 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
-from monopoly_companion.db import get_db, init_property_ownership, starting_cash, get_property_value, get_net_worth
+from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+from monopoly_companion.db import get_db, init_property_ownership, starting_cash, get_property_value, get_net_worth, log_net_worth
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
@@ -29,9 +29,15 @@ def index():
         else:
             session.clear()
             session['game_version_id'] = game_version['game_version_id']
+            session['go_value'] = game_version['go_value']
             session['no_of_players'] = no_of_players
-            
-            init_property_ownership(db, game_version['game_version_id'])
+
+            if request.form.get('double_go'):
+                session['double_go'] = True
+            else:
+                session['double_go'] = False
+
+            init_property_ownership(db, session['game_version_id'])
 
             return redirect(url_for('game_setup.player_registration'))
 
@@ -86,11 +92,12 @@ def player_registration():
                 db.execute(
                     """
                     INSERT INTO net_worth (turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value) 
-                    VALUES (1, ?, ?, ?, ?, ?)
+                    VALUES (0, ?, ?, ?, ?, ?)
                     """,
                     (player_id, cash_balance, net_property_value, improvement_value, gross_property_value)
                 )
-
+            
+            log_net_worth(db)
             db.commit()
 
             current_net_worth_table, current_net_worths = get_net_worth(db)

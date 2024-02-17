@@ -1,6 +1,6 @@
 import sqlite3
 import click
-from flask import current_app, g
+from flask import current_app, g, session
 import pandas as pd
 
 def get_db():
@@ -44,6 +44,7 @@ def init_data(db):
         DELETE FROM property;
         DELETE FROM special_counter;
         DELETE FROM net_worth;
+        DELETE FROM net_worth_log;
         DELETE FROM transactions;
         DELETE FROM property_ownership;
         VACUUM;
@@ -55,6 +56,7 @@ def init_data(db):
         data.to_sql(df, con=db, if_exists="append", index=False)
 
     db.commit()
+    session.clear()
     return
 
 def init_property_ownership(db, game_version_id):
@@ -333,10 +335,7 @@ def get_improvement_value(db):
     return improvement_values
 
 def get_net_worth(db):
-    # get most recent net_worth row for all players to represent current net_worth
-
-    current_net_worths = {}
-
+    # get net_worth rows for all players to represent current net_worth
     current_net_worth_table = db.execute(
         """
         SELECT 
@@ -353,33 +352,43 @@ def get_net_worth(db):
         """
     ).fetchall()
 
-    for row in current_net_worth_table:
-        current_net_worths[row['player_id']] = [0, 0, 0, 0, 0]
-        current_net_worths[row['player_id']][0] = row['cash_balance']
-        current_net_worths[row['player_id']][1] = row['net_property_value']
-        current_net_worths[row['player_id']][2] = row['improvement_value']
-        current_net_worths[row['player_id']][3] = row['gross_property_value']
-        current_net_worths[row['player_id']][4] = row['net_worth']
+    try:
+        for row in current_net_worth_table:
+            current_net_worths[row['player_id']][0] = row['cash_balance']
+            current_net_worths[row['player_id']][1] = row['net_property_value']
+            current_net_worths[row['player_id']][2] = row['improvement_value']
+            current_net_worths[row['player_id']][3] = row['gross_property_value']
+            current_net_worths[row['player_id']][4] = row['net_worth']
+    except:
+        current_net_worths = {}
+
+        for row in current_net_worth_table:
+            current_net_worths[row['player_id']] = [0, 0, 0, 0, 0]
+            current_net_worths[row['player_id']][0] = row['cash_balance']
+            current_net_worths[row['player_id']][1] = row['net_property_value']
+            current_net_worths[row['player_id']][2] = row['improvement_value']
+            current_net_worths[row['player_id']][3] = row['gross_property_value']
+            current_net_worths[row['player_id']][4] = row['net_worth']
         
     return current_net_worth_table, current_net_worths
 
-def log_net_worth(db=None):
-    # add rows to net_worth_log table that contain the most recent net_worth data. This is to be used whenever a turn ends.
-    if db is None:
-        db = get_db()
-
-    # copy all data from net_worth to log_net_worth 
+def update_net_worth_turn(db):
+    db.execute("UPDATE net_worth SET turn = ? WHERE player_id IN (1, 2, ?)",
+               (session['current_turn'], session['current_player_id'])
+               )
     return
 
-def next_player(current_player_order, no_of_players, turn):
+def next_player(db, current_player_order, no_of_players, turn):
     # increment the current_player_order up to the no_of_players, at which point it restarts at order 1 and increments turn
 
     if current_player_order == no_of_players:
         current_player_order = 1 
         turn += 1
-        log_net_worth() # think about how to unlog net_worth when previous_player or undo_action
+        log_net_worth(db) # think about how to unlog net_worth when previous_player or undo_action
     else:
         current_player_order += 1
+    
+    db.commit()
     return current_player_order, turn
 
 def previous_player(current_player_order, no_of_players, turn):
@@ -396,6 +405,18 @@ def undo_action():
     return
 
 # this section contains the functions for action-type database updates. This will make the code in index() easier to understand.
+def log_net_worth(db):
+    # add rows to net_worth_log table that contain the most recent net_worth data. This is to be used whenever a turn ends.
+    
+    # copy all data from net_worth to log_net_worth 
+    db.execute(
+        """
+        INSERT INTO net_worth_log (net_worth_time, turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value, net_worth)
+        SELECT net_worth_time, turn, player_id, cash_balance, net_property_value, improvement_value, gross_property_value, net_worth FROM net_worth
+        """
+    )
+    return
+
 def record_transaction(db, turn, party_player_id, counterparty_player_id, action_type_id, property_id=None, cash_received=None, cash_paid=None, asset_value_received=None, asset_value_paid=None):
     db.execute(
         """
@@ -419,13 +440,18 @@ def purchase_property(db, current_player_id, property_name, turn):
     db.execute(
         """
         UPDATE net_worth
-        SET turn = ?,
-            cash_balance = cash_balance - ?,
+        SET cash_balance = cash_balance - ?,
             net_property_value = net_property_value + ?,
             gross_property_value = gross_property_value + ?
+        WHERE player_id = ?;
+
+        UPDATE net_worth
+        SET cash_balance = cash_balance + ?,
+            net_property_value = net_property_value - ?,
+            gross_property_value = gross_property_value - ?
         WHERE player_id = ?
         """,
-        (turn, price, price, price, current_player_id)
+        (price, price, price, current_player_id, price, price, price, 1)
     )
     
     # assign ownership to player    
@@ -514,14 +540,13 @@ def rent(db, current_player_id, property_name, turn):
     db.execute(
         """
         UPDATE net_worth
-        SET turn = ?, 
-            cash_balance = CASE
+        SET cash_balance = CASE
             WHEN player_id = ? THEN cash_balance + ?
             WHEN player_id = ? THEN cash_balance - ?
             END
         WHERE player_id IN (?,?)
         """,
-        (turn, property_details['owner_player_id'], rent_due, current_player_id, rent_due, property_details['owner_player_id'], current_player_id)
+        (property_details['owner_player_id'], rent_due, current_player_id, rent_due, property_details['owner_player_id'], current_player_id)
     )
     
     # add the transaction to transactions table
@@ -530,8 +555,48 @@ def rent(db, current_player_id, property_name, turn):
 
     return
 
-def go():
+def go(db, landed_on=False):
     # pass or land on go
+   
+    # if player lands on and double_go rule in effect, increase player's cash balance by 2*game_version.go_value and increment special counter
+    if landed_on and session['double_go']:
+        double_go_value = session['go_value']*2
+        db.execute(
+            """
+            UPDATE net_worth
+            SET cash_balance = 
+                CASE 
+                    WHEN player_id = ? THEN cash_balance + ?
+                    WHEN player_id = 1 THEN cash_balance - ?
+                END
+            WHERE player_id IN (1, ?)
+            """,
+            (session['current_player_id'], double_go_value, double_go_value, session['current_player_id'])
+            )
+        # increment special counter TBD 
+        
+        # record transaction 
+        record_transaction(db, session['current_turn'], session['current_player_id'], 1, 4, cash_received=double_go_value)
+
+    # if player passes (or lands and double_go rule not in effect), only increase player's cash balance by game_version.go_value
+    else:
+        db.execute(
+            """
+            UPDATE net_worth
+            SET cash_balance = 
+                CASE 
+                    WHEN player_id = ? THEN cash_balance + ?
+                    WHEN player_id = 1 THEN cash_balance - ?
+                END
+            WHERE player_id IN (1, ?)
+            """,
+            (session['current_player_id'], session['go_value'], session['go_value'], session['current_player_id'])
+            )
+    
+        # record transaction
+        record_transaction(db, session['current_turn'], session['current_player_id'], 1, 3, cash_received=session['go_value'])
+
+    db.commit()
     return
 
 def build():

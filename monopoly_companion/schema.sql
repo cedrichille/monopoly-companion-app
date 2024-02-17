@@ -9,7 +9,8 @@ CREATE TABLE "game_version" (
   "game_version_name" VARCHAR NOT NULL,
   "game_version_language" VARCHAR NOT NULL,
   "total_cash" INTEGER NOT NULL,
-  "starting_cash_balance" INTEGER NOT NULL
+  "starting_cash_balance" INTEGER NOT NULL,
+  "go_value" INTEGER NOT NULL
 );  
 
 CREATE TABLE "property" (
@@ -94,7 +95,7 @@ CREATE TABLE "net_worth" (
 );
 
 CREATE TABLE "net_worth_log" (
-  "net_worth_id" INTEGER PRIMARY KEY,
+  "net_worth_log_id" INTEGER PRIMARY KEY,
   "net_worth_time" TIMESTAMP NOT NULL,
   "turn" INTEGER NOT NULL,
   "player_id" INTEGER NOT NULL,

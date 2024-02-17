@@ -5,14 +5,17 @@ Gameplay
 {% block content %}
 <div class="navbar">
   {% for player in players.items() %}
-  <a><span>{{ player[1][0] }} <br> Cash Balance: ${{ net_worths[player[0]][0] }}; Net Worth: ${{ net_worths[player[0]][4] }}</span>
+  <a><span>{{ player[1][0] }} <br> Cash Balance: ${{ net_worths[player[0]][0] }} &emsp; Net Worth: ${{ net_worths[player[0]][4] }}</span>
   <hr>
   {% endfor %}
 </div>
 
 <p>Current player: {{ players[current_player_id|string][0] }} &emsp; Turn: {{ current_turn }}</p>
 <form method="post">
-  <input type="submit" value="Next player">
+  <input type="submit" name="pass_go" value="Pass Go">
+  <input type="submit" name="land_on_go" value="Land on Go">
+  <br><br>
+  <input type="submit" name="next_player" value="Next player">
 </form>
 
 <nav>

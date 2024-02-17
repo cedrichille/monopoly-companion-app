@@ -8,7 +8,7 @@ def index():
     if request.method == "POST":
         db = get_db()
         init_data(db)
-        
+                
         session['game_started'] = 0
 
         return redirect(url_for("game_setup.index"))
