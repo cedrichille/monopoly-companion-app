@@ -5,7 +5,9 @@ Gameplay
 {% block content %}
 <div class="navbar">
   {% for player in players.items() %}
-  <a><span>{{ player[1][0] }} <br> Cash Balance: ${{ net_worths[player[0]][0] }} &emsp; Net Worth: ${{ net_worths[player[0]][4] }}</span>
+  {% set player_name = player[1] %}
+  {% set player_id = player[0] %}
+  <a><span>{{ player_name[0] }} <br> Cash Balance: ${{ net_worths[player_id][0] }} &emsp; Net Worth: ${{ net_worths[player_id][4] }}</span>
   <hr>
   {% endfor %}
 </div>

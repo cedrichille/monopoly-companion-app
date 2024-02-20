@@ -351,26 +351,26 @@ def get_net_worth(db):
         net_worth
         """
     ).fetchall()
+    
 
     try:
         for row in current_net_worth_table:
-            current_net_worths[row['player_id']][0] = row['cash_balance']
-            current_net_worths[row['player_id']][1] = row['net_property_value']
-            current_net_worths[row['player_id']][2] = row['improvement_value']
-            current_net_worths[row['player_id']][3] = row['gross_property_value']
-            current_net_worths[row['player_id']][4] = row['net_worth']
+            session['net_worths'][str(row['player_id'])][0] = row['cash_balance']
+            session['net_worths'][str(row['player_id'])][1] = row['net_property_value']
+            session['net_worths'][str(row['player_id'])][2] = row['improvement_value']
+            session['net_worths'][str(row['player_id'])][3] = row['gross_property_value']
+            session['net_worths'][str(row['player_id'])][4] = row['net_worth']
     except:
-        current_net_worths = {}
-
+        session['net_worths'] = {}
         for row in current_net_worth_table:
-            current_net_worths[row['player_id']] = [0, 0, 0, 0, 0]
-            current_net_worths[row['player_id']][0] = row['cash_balance']
-            current_net_worths[row['player_id']][1] = row['net_property_value']
-            current_net_worths[row['player_id']][2] = row['improvement_value']
-            current_net_worths[row['player_id']][3] = row['gross_property_value']
-            current_net_worths[row['player_id']][4] = row['net_worth']
+            session['net_worths'][str(row['player_id'])] = [0, 0, 0, 0, 0]
+            session['net_worths'][str(row['player_id'])][0] = row['cash_balance']
+            session['net_worths'][str(row['player_id'])][1] = row['net_property_value']
+            session['net_worths'][str(row['player_id'])][2] = row['improvement_value']
+            session['net_worths'][str(row['player_id'])][3] = row['gross_property_value']
+            session['net_worths'][str(row['player_id'])][4] = row['net_worth']
         
-    return current_net_worth_table, current_net_worths
+    return current_net_worth_table, session['net_worths']
 
 def update_net_worth_turn(db):
     db.execute("UPDATE net_worth SET turn = ? WHERE player_id IN (1, 2, ?)",

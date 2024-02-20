@@ -106,7 +106,6 @@ def player_registration():
             session['current_player_id'] = 3
             session['game_started'] = 1
             session['current_turn'] = 1
-            session['net_worths'] = current_net_worths
 
             return redirect(url_for("gameplay.index"))
   
