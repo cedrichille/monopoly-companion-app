@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
-from monopoly_companion.db import get_db, init_property_ownership, starting_cash, get_property_value, get_net_worth, log_net_worth
+from monopoly_companion.db import get_db, init_property_ownership, init_special_counter, starting_cash, get_property_value, get_net_worth, log_net_worth
 
 bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='static')
 
@@ -96,7 +96,8 @@ def player_registration():
                     """,
                     (player_id, cash_balance, net_property_value, improvement_value, gross_property_value)
                 )
-            
+                init_special_counter(db, player_id)
+
             log_net_worth(db)
             db.commit()
 

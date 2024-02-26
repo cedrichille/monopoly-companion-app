@@ -74,18 +74,36 @@ def init_property_ownership(db, game_version_id):
     #     db.execute(
     #         "DELETE FROM property_ownership"
     #     )
+    property_names = []
 
     for prop in properties:
         db.execute(
             "INSERT INTO property_ownership VALUES (?, 1, FALSE, 0, 0, 0, FALSE)",
             (prop['property_id'],)
         )
+
+        property_names.append(prop['property_name'])
+
     db.commit()
 
     update_number_owned(db)
     update_max_number_owned(db)
 
+    session['property_names'] = property_names
     return 
+
+def init_special_counter(db, player_id):
+    # fill the special_counter table with a row for the player, but leave all values at 0. This is called in a loop through all players in player registration
+
+    db.execute(
+        """
+        INSERT INTO special_counter (turn, player_id, jail_counter, free_parking_counter, income_tax_counter, luxury_tax_counter, land_on_start_counter, chance_counter, community_chest_counter)
+        VALUES (0, ?, 0, 0, 0, 0, 0, 0, 0)
+        """,
+        (player_id,)
+    )
+
+    return
 
 def update_max_number_owned(db):
     # update the "max_number_owned" field in the property_ownership table to enable comparison to number owned to determine "monopoly" column
@@ -444,14 +462,19 @@ def purchase_property(db, current_player_id, property_name, turn):
             net_property_value = net_property_value + ?,
             gross_property_value = gross_property_value + ?
         WHERE player_id = ?;
+        """,
+        (price, price, price, current_player_id)
+    )
 
+    db.execute(
+        """
         UPDATE net_worth
         SET cash_balance = cash_balance + ?,
             net_property_value = net_property_value - ?,
             gross_property_value = gross_property_value - ?
         WHERE player_id = ?
         """,
-        (price, price, price, current_player_id, price, price, price, 1)
+        (price, price, price, 1)
     )
     
     # assign ownership to player    
@@ -481,7 +504,7 @@ def rent(db, current_player_id, property_name, turn):
     property_details = db.execute(
         "SELECT * FROM property LEFT JOIN property_ownership on property.property_id = property_ownership.property_id WHERE property.property_name = ?",
         (property_name,)
-    ).fetchall()
+    ).fetchone()
 
     if property_details['owner_player_id'] == 1:
         rent_due = 0
@@ -553,7 +576,7 @@ def rent(db, current_player_id, property_name, turn):
     record_transaction(db, turn, current_player_id, property_details['owner_player_id'], 2, property_details['property_id'], cash_paid=rent_due)
     db.commit()
 
-    return
+    return rent_due, comment
 
 def go(db, landed_on=False):
     # pass or land on go
@@ -574,7 +597,15 @@ def go(db, landed_on=False):
             (session['current_player_id'], double_go_value, double_go_value, session['current_player_id'])
             )
         # increment special counter TBD 
-        
+        db.execute(
+            """
+            UPDATE special_counter
+            SET turn = ?,
+                land_on_start_counter = land_on_start_counter + 1
+            WHERE player_id = ?
+            """,
+            (session['current_turn'], session['current_player_id'])
+        )
         # record transaction 
         record_transaction(db, session['current_turn'], session['current_player_id'], 1, 4, cash_received=double_go_value)
 

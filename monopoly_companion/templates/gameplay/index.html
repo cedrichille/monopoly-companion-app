@@ -17,6 +17,17 @@ Gameplay
   <input type="submit" name="pass_go" value="Pass Go">
   <input type="submit" name="land_on_go" value="Land on Go">
   <br><br>
+
+  <select name="property_name" id="property_name">
+      <option value="", selected disabled hidden>Property Name</option>
+      {% for property in property_names %}
+      <option value="{{ property }}">{{ property }}</option>
+      {% endfor %}
+  </select>
+  <br><br>
+  <input type="submit" name="purchase_property" value="Purchase Property">    
+  <input type="submit" name="rent" value="Pay rent">
+  <br><br>
   <input type="submit" name="next_player" value="Next player">
 </form>
 
