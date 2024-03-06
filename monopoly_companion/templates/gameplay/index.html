@@ -17,13 +17,19 @@ Gameplay
   <input type="submit" name="pass_go" value="Pass Go">
   <input type="submit" name="land_on_go" value="Land on Go">
   <br><br>
-
   <select name="property_name" id="property_name">
       <option value="", selected disabled hidden>Property Name</option>
       {% for property in property_names %}
       <option value="{{ property }}">{{ property }}</option>
       {% endfor %}
   </select>
+
+  <select name="dice_roll" id="dice_roll">
+    <option value="", selected disabled hidden>Dice roll</option>
+    {% for roll in range(2,13) %}
+    <option value="{{ roll }}">{{ roll }}</option>
+    {% endfor %}
+</select>
   <br><br>
   <input type="submit" name="purchase_property" value="Purchase Property">    
   <input type="submit" name="rent" value="Pay rent">

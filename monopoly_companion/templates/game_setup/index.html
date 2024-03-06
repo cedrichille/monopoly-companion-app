@@ -7,10 +7,20 @@ Game Setup
 <hr/>
 <form method="post">
     <!-- <label for="game_version">Game Version</label> -->
-    <input name="game_version" id="game_version" placeholder="Game Version">
+    <select name="game_version" id="game_version">
+        <option value="", selected disabled hidden>Game Version</option>
+        {% for game_version in game_version_names %}
+        <option value="{{ game_version }}">{{ game_version }}</option>
+        {% endfor %}
+    </select>
     <br><br>
     <!-- <label for="no_of_players">Number of Players</label> -->
-    <input name="no_of_players" id="no_of_players" placeholder="Number of Players">
+    <select name="no_of_players" id="no_of_players">
+        <option value="", selected disabled hidden>Number of Players</option>
+        {% for number in range(2,7) %}
+        <option value="{{ number }}">{{ number }}</option>
+        {% endfor %}
+    </select>
     <br><br>
     <label for="double_go">House Rule: landing on Go doubles payout?</label>
     <input type="checkbox" name="double_go" id="double_go" checked>

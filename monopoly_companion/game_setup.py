@@ -7,10 +7,22 @@ bp = Blueprint('game_setup', __name__, url_prefix='/game-setup', static_folder='
 
 @bp.route("/", methods=("GET","POST"))
 def index():
-    if request.method == "POST":
+    db = get_db()
+    if request.method == "GET":
+        game_versions = db.execute(
+            "SELECT * FROM game_version"
+        ).fetchall()
+
+        game_version_names = []
+
+        for game_version in game_versions:
+            game_version_names.append(game_version['game_version_name'])
+        
+        session['game_version_names'] = game_version_names
+
+    elif request.method == "POST":
         game_version_name = request.form['game_version']
         no_of_players = int(request.form['no_of_players'])
-        db = get_db()
         error = None
         
         if not game_version_name:
@@ -43,7 +55,7 @@ def index():
 
         flash(error)
 
-    return render_template("game_setup/index.html")
+    return render_template("game_setup/index.html",game_version_names=session['game_version_names'])
 
 @bp.route("/player_registration/", methods=("GET","POST"))
 def player_registration():

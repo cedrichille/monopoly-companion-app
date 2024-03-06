@@ -497,7 +497,7 @@ def trade_property():
     # trade property (has more requirements, leave till end)
     return
 
-def rent(db, current_player_id, property_name, turn):
+def rent(db, current_player_id, property_name, turn, dice_roll=0):
     # pay rent to owner on property
 
     # get rent due (consider mortgaged, monopoly, houses, and hotels)
@@ -509,6 +509,10 @@ def rent(db, current_player_id, property_name, turn):
     if property_details['owner_player_id'] == 1:
         rent_due = 0
         comment = "Property owned by bank! No rent due."
+    
+    elif property_details['owner_player_id'] == int(current_player_id):
+        rent_due = 0
+        comment = "Property owned by current player! No rent due."
 
     elif property_details['mortgaged'] == True:
         rent_due = 0
@@ -549,11 +553,13 @@ def rent(db, current_player_id, property_name, turn):
         
     elif property_details['property_type'] == "Utility":
         if property_details['number_owned'] == 1:
-            rent_due = property_details['rent_multiplier_one_owned']
-            comment = "One utility owned. Multiply the dice roll by: " + str(rent_due) + "."
+            rent_multiplier = property_details['rent_multiplier_one_owned']
+            rent_due = rent_multiplier * dice_roll
+            comment = "One utility owned. Multiply the dice roll by " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
         else:
-            rent_due = property_details['rent_multiplier_two_owned']
-            comment = "Two utilities owned. Multiply the dice roll by: " + str(rent_due) + "."
+            rent_multiplier = property_details['rent_multiplier_two_owned']
+            rent_due = rent_multiplier * dice_roll
+            comment = "Two utilities owned. Multiply the dice roll by " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
     
     else:
         rent_due = property_details['rent_basic']

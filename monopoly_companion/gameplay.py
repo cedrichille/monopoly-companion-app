@@ -38,7 +38,11 @@ def index():
         
         elif 'rent' in request.form:
             property_name = request.form['property_name']
-            rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'])
+            try:
+                dice_roll = int(request.form['dice_roll'])
+                rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'], dice_roll)
+            except KeyError:
+                rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'])
             flash(comment)
 
         else:
