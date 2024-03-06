@@ -607,7 +607,7 @@ def go(db, landed_on=False):
             """,
             (session['current_player_id'], double_go_value, double_go_value, session['current_player_id'])
             )
-        # increment special counter TBD 
+        # increment special counter 
         db.execute(
             """
             UPDATE special_counter
@@ -617,6 +617,7 @@ def go(db, landed_on=False):
             """,
             (session['current_turn'], session['current_player_id'])
         )
+
         # record transaction 
         record_transaction(db, session['current_turn'], session['current_player_id'], 1, 4, cash_received=double_go_value)
 
@@ -634,10 +635,21 @@ def go(db, landed_on=False):
             """,
             (session['current_player_id'], session['go_value'], session['go_value'], session['current_player_id'])
             )
-    
+        
         # record transaction
         record_transaction(db, session['current_turn'], session['current_player_id'], 1, 3, cash_received=session['go_value'])
-
+        
+        # increment special counter if landed on go
+        if landed_on:
+            db.execute(
+                """
+                UPDATE special_counter
+                SET turn = ?,
+                    land_on_start_counter = land_on_start_counter + 1
+                WHERE player_id = ?
+                """,
+                (session['current_turn'], session['current_player_id'])
+            )    
     db.commit()
     return
 
