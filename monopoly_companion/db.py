@@ -491,13 +491,14 @@ def purchase_property(db, current_player_id, property_name, turn):
     # add the transaction to transactions table
     record_transaction(db, turn, current_player_id, 1, 1, property_id, None, price, price, None)
     db.commit()
-    return
+    comment = str(property_name) + " purchased for " + str(price) + "." 
+    return comment
 
 def trade_property():
     # trade property (has more requirements, leave till end)
     return
 
-def rent(db, current_player_id, property_name, turn, dice_roll=0):
+def rent(db, current_player_id, property_name, turn, dice_roll=None):
     # pay rent to owner on property
 
     # get rent due (consider mortgaged, monopoly, houses, and hotels)
@@ -552,15 +553,19 @@ def rent(db, current_player_id, property_name, turn, dice_roll=0):
             comment = "Four stations owned: " + str(rent_due) + " due."
         
     elif property_details['property_type'] == "Utility":
-        if property_details['number_owned'] == 1:
-            rent_multiplier = property_details['rent_multiplier_one_owned']
-            rent_due = rent_multiplier * dice_roll
-            comment = "One utility owned. Multiply the dice roll by " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
-        else:
-            rent_multiplier = property_details['rent_multiplier_two_owned']
-            rent_due = rent_multiplier * dice_roll
-            comment = "Two utilities owned. Multiply the dice roll by " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
-    
+        try:
+            if property_details['number_owned'] == 1:
+                rent_multiplier = property_details['rent_multiplier_one_owned']
+                rent_due = rent_multiplier * dice_roll
+                comment = "With one utility owned, the rent multiplier is " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
+            else:
+                rent_multiplier = property_details['rent_multiplier_two_owned']
+                rent_due = rent_multiplier * dice_roll
+                comment = "With two utilities owned, the rent multiplier is " + str(rent_multiplier) + ". Rent due: " + str(rent_due) + "."
+        except TypeError:
+            comment = "Please provide dice roll to calculate rent!"
+            return None, comment
+
     else:
         rent_due = property_details['rent_basic']
         comment = "Rent due: " + str(rent_due) + "."

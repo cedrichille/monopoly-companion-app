@@ -33,20 +33,29 @@ def index():
             go(db,True)
 
         elif 'purchase_property' in request.form:
-            property_name = request.form['property_name']
-            purchase_property(db, session['current_player_id'], property_name, session['current_turn'])
-        
-        elif 'rent' in request.form:
-            property_name = request.form['property_name']
-            try:
-                dice_roll = int(request.form['dice_roll'])
-                rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'], dice_roll)
+            try: 
+                property_name = request.form['property_name']
+                comment = purchase_property(db, session['current_player_id'], property_name, session['current_turn'])
             except KeyError:
-                rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'])
+                comment = "Please select property from dropdown."
             flash(comment)
 
+        elif 'rent' in request.form:
+            try:
+                property_name = request.form['property_name']
+                try:
+                    dice_roll = int(request.form['dice_roll'])
+                    rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'], dice_roll)
+                except KeyError:
+                    rent_due, comment = rent(db, session['current_player_id'], property_name, session['current_turn'])
+            except KeyError:
+                comment = "Please select property from dropdown."
+            
+            flash(comment)
         else:
             pass
+
+
 
         net_worth_table, session['net_worths'] = get_net_worth(db)
 
